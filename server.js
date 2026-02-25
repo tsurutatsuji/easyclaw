@@ -1,5 +1,6 @@
 const express = require("express");
 const { execSync } = require("child_process");
+const http = require("http");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
@@ -11,8 +12,8 @@ const app = express();
 app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("/home/ubuntu/easyclaw-api/public"));
-app.get("/", (req, res) => { res.sendFile("/home/ubuntu/easyclaw-api/public/lp.html"); });
+app.use(express.static(path.join(__dirname, "public")));
+app.get("/", (req, res) => { res.sendFile(path.join(__dirname, "public", "lp.html")); });
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-here";
 
 // JWT認証ミドルウェア
@@ -41,7 +42,7 @@ const STRIPE_PRICES = { standard: process.env.STRIPE_PRICE_STANDARD || "" };
 let stripe = null;
 function getStripe() { if (!stripe && STRIPE_SECRET_KEY) stripe = require("stripe")(STRIPE_SECRET_KEY); return stripe; }
 const PLAN_LIMITS = { free: { maxBots: 0, label: "Free" }, standard: { maxBots: 3, label: "スタンダード（￥980/週）" } };
-const db = new Database("/home/ubuntu/easyclaw-api/users.db");
+const db = new Database(path.join(__dirname, "users.db"));
 db.exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT, createdAt TEXT)");
 db.exec("CREATE TABLE IF NOT EXISTS otp_codes (id INTEGER PRIMARY KEY, email TEXT, code TEXT, expiresAt TEXT, used INTEGER DEFAULT 0)");
 try { db.exec("ALTER TABLE users ADD COLUMN emailVerified INTEGER DEFAULT 0"); } catch(e) {}
@@ -51,12 +52,18 @@ async function sendOTP(email) {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
   db.prepare("DELETE FROM otp_codes WHERE email=?").run(email);
   db.prepare("INSERT INTO otp_codes (email, code, expiresAt) VALUES (?,?,?)").run(email, code, expiresAt);
-  await transporter.sendMail({
-    from: '"EasyClaw" <' + process.env.GMAIL_USER + '>',
-    to: email,
-    subject: "【EasyClaw】認証コード: " + code,
-    html: "<div style='font-family:sans-serif;max-width:400px;margin:0 auto;padding:32px;background:#1a1a2e;color:#fff;border-radius:12px'><h2 style='text-align:center;color:#ff5722'>EasyClaw</h2><p style='text-align:center'>あなたの認証コード:</p><div style='text-align:center;font-size:36px;font-weight:bold;letter-spacing:8px;padding:16px;background:#16213e;border-radius:8px;margin:16px 0'>" + code + "</div><p style='text-align:center;color:#999;font-size:12px'>このコードは10分間有効です</p></div>"
-  });
+  if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
+    await transporter.sendMail({
+      from: '"EasyClaw" <' + process.env.GMAIL_USER + '>',
+      to: email,
+      subject: "【EasyClaw】認証コード: " + code,
+      html: "<div style='font-family:sans-serif;max-width:400px;margin:0 auto;padding:32px;background:#1a1a2e;color:#fff;border-radius:12px'><h2 style='text-align:center;color:#ff5722'>EasyClaw</h2><p style='text-align:center'>あなたの認証コード:</p><div style='text-align:center;font-size:36px;font-weight:bold;letter-spacing:8px;padding:16px;background:#16213e;border-radius:8px;margin:16px 0'>" + code + "</div><p style='text-align:center;color:#999;font-size:12px'>このコードは10分間有効です</p></div>"
+    });
+  } else {
+    console.log("\n========================================");
+    console.log("  OTP for " + email + ": " + code);
+    console.log("========================================\n");
+  }
   return code;
 }
 db.exec("CREATE TABLE IF NOT EXISTS deployments (id INTEGER PRIMARY KEY, userId TEXT, email TEXT, port INTEGER, model TEXT, status TEXT, createdAt TEXT)");
@@ -64,8 +71,42 @@ const addCol = (t, c, type, def) => { try { db.exec("ALTER TABLE " + t + " ADD C
 addCol("users", "plan", "TEXT", "free");
 addCol("users", "stripeCustomerId", "TEXT", "NULL");
 addCol("users", "stripeSubscriptionId", "TEXT", "NULL");
+
+// --- 新テーブル: user_settings, chat_sessions, chat_messages ---
+db.exec(`CREATE TABLE IF NOT EXISTS user_settings (
+  id INTEGER PRIMARY KEY,
+  email TEXT UNIQUE,
+  userId TEXT,
+  provider TEXT DEFAULT 'ollama',
+  ollamaUrl TEXT DEFAULT 'http://localhost:11434',
+  model TEXT DEFAULT 'llama3.2',
+  apiKey TEXT,
+  setupCompleted INTEGER DEFAULT 0,
+  createdAt TEXT,
+  updatedAt TEXT
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS chat_sessions (
+  id INTEGER PRIMARY KEY,
+  email TEXT,
+  sessionKey TEXT UNIQUE,
+  title TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS chat_messages (
+  id INTEGER PRIMARY KEY,
+  sessionKey TEXT,
+  role TEXT,
+  content TEXT,
+  model TEXT,
+  timestamp TEXT
+)`);
+
+function generateUserId(email) {
+  return email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+}
 function auth(req, res, next) { const t = req.headers.authorization; if (!t) return res.status(401).json({ error: "\u30ed\u30b0\u30a4\u30f3\u5fc5\u9808" }); try { req.user = jwt.verify(t.replace("Bearer ", ""), JWT_SECRET); next(); } catch(e) { res.status(401).json({ error: "\u518d\u30ed\u30b0\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044" }); } }
-app.post("/api/register", async (req, res) => { try { const { email, password } = req.body; if (!email || !password) return res.status(400).json({ error: "メールとパスワードを入力" }); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "正しいメールアドレスを入力してください" }); if (password.length < 6) return res.status(400).json({ error: "パスワードは6文字以上" }); const existing = db.prepare("SELECT * FROM users WHERE email=?").get(email); if (existing && existing.emailVerified) return res.status(400).json({ error: "登録済みメール" }); if (existing && !existing.emailVerified) { db.prepare("UPDATE users SET password=? WHERE email=?").run(bcrypt.hashSync(password, 10), email); } else { const hash = bcrypt.hashSync(password, 10); db.prepare("INSERT INTO users (email, password, emailVerified, createdAt) VALUES (?,?,0,?)").run(email, hash, new Date().toISOString()); } await sendOTP(email); res.json({ success: true, needVerify: true, email }); } catch(e) { console.error("Register error:", e.message); res.status(500).json({ error: "登録に失敗しました" }); } });
+app.post("/api/register", async (req, res) => { try { const { email, password } = req.body; if (!email || !password) return res.status(400).json({ error: "メールとパスワードを入力" }); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "正しいメールアドレスを入力してください" }); if (password.length < 6) return res.status(400).json({ error: "パスワードは6文字以上" }); const existing = db.prepare("SELECT * FROM users WHERE email=?").get(email); if (existing && existing.emailVerified) return res.status(400).json({ error: "登録済みメール" }); if (existing && !existing.emailVerified) { db.prepare("UPDATE users SET password=? WHERE email=?").run(bcrypt.hashSync(password, 10), email); } else { const hash = bcrypt.hashSync(password, 10); db.prepare("INSERT INTO users (email, password, emailVerified, createdAt) VALUES (?,?,0,?)").run(email, hash, new Date().toISOString()); } const existingSettings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(email); if (!existingSettings) { db.prepare("INSERT INTO user_settings (email, userId, createdAt) VALUES (?,?,?)").run(email, generateUserId(email), new Date().toISOString()); } await sendOTP(email); res.json({ success: true, needVerify: true, email }); } catch(e) { console.error("Register error:", e.message); res.status(500).json({ error: "登録に失敗しました" }); } });
 app.post("/api/verify-otp", (req, res) => { try { const { email, code } = req.body; if (!email || !code) return res.status(400).json({ error: "コードを入力してください" }); const otp = db.prepare("SELECT * FROM otp_codes WHERE email=? AND code=? AND used=0").get(email, code); if (!otp) return res.status(400).json({ error: "認証コードが無効です" }); if (new Date(otp.expiresAt) < new Date()) return res.status(400).json({ error: "認証コードの有効期限が切れました" }); db.prepare("UPDATE otp_codes SET used=1 WHERE id=?").run(otp.id); db.prepare("UPDATE users SET emailVerified=1 WHERE email=?").run(email); const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" }); res.json({ success: true, token, email }); } catch(e) { res.status(500).json({ error: e.message }); } });
 app.post("/api/resend-otp", async (req, res) => { try { const { email } = req.body; if (!email) return res.status(400).json({ error: "メールアドレスが必要です" }); await sendOTP(email); res.json({ success: true }); } catch(e) { res.status(500).json({ error: "送信失敗" }); } });
 app.post("/api/login", async (req, res) => { const { email, password } = req.body; if (!email || !password) return res.status(400).json({ error: "メールとパスワードを入力" }); const user = db.prepare("SELECT * FROM users WHERE email=?").get(email); if (!user || !bcrypt.compareSync(password, user.password)) return res.status(401).json({ error: "メールまたはパスワードが違います" }); if (!user.emailVerified) { await sendOTP(email); return res.json({ success: true, needVerify: true, email }); } const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" }); res.json({ success: true, token, email }); });
@@ -301,6 +342,187 @@ app.get("/api/get-configured-apis", authenticateToken, async (req, res) => {
   }
 });
 
+
+// --- Verify Token ---
+app.get("/api/verify-token", auth, (req, res) => {
+  const settings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+  res.json({ valid: true, email: req.user.email, setupCompleted: settings ? settings.setupCompleted : 0 });
+});
+
+// --- User Settings ---
+app.get("/api/settings", auth, (req, res) => {
+  let settings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+  if (!settings) {
+    db.prepare("INSERT INTO user_settings (email, userId, createdAt) VALUES (?,?,?)").run(req.user.email, generateUserId(req.user.email), new Date().toISOString());
+    settings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+  }
+  res.json({ success: true, settings });
+});
+
+app.post("/api/settings", auth, (req, res) => {
+  const { provider, ollamaUrl, model, apiKey } = req.body;
+  const now = new Date().toISOString();
+  const existing = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+  if (existing) {
+    db.prepare("UPDATE user_settings SET provider=?, ollamaUrl=?, model=?, apiKey=?, setupCompleted=1, updatedAt=? WHERE email=?")
+      .run(provider || "ollama", ollamaUrl || "http://localhost:11434", model || "llama3.2", apiKey || null, now, req.user.email);
+  } else {
+    db.prepare("INSERT INTO user_settings (email, userId, provider, ollamaUrl, model, apiKey, setupCompleted, createdAt, updatedAt) VALUES (?,?,?,?,?,?,1,?,?)")
+      .run(req.user.email, generateUserId(req.user.email), provider || "ollama", ollamaUrl || "http://localhost:11434", model || "llama3.2", apiKey || null, now, now);
+  }
+  res.json({ success: true });
+});
+
+// --- Ollama Proxy ---
+function ollamaRequest(ollamaUrl, apiPath, method, body) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(apiPath, ollamaUrl);
+    const options = { hostname: url.hostname, port: url.port, path: url.pathname, method, headers: { "Content-Type": "application/json" } };
+    const req = http.request(options, (resp) => {
+      let data = "";
+      resp.on("data", (chunk) => { data += chunk; });
+      resp.on("end", () => { try { resolve({ status: resp.statusCode, data: JSON.parse(data) }); } catch(e) { resolve({ status: resp.statusCode, data: data }); } });
+    });
+    req.on("error", (e) => reject(e));
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error("timeout")); });
+    if (body) req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+app.get("/api/ollama/models", auth, async (req, res) => {
+  try {
+    const settings = db.prepare("SELECT ollamaUrl FROM user_settings WHERE email=?").get(req.user.email);
+    const ollamaUrl = (settings && settings.ollamaUrl) || "http://localhost:11434";
+    const result = await ollamaRequest(ollamaUrl, "/api/tags", "GET");
+    res.json({ success: true, models: result.data.models || [] });
+  } catch(e) { res.json({ success: false, error: "Ollamaに接続できません: " + e.message, models: [] }); }
+});
+
+app.get("/api/ollama/health", auth, async (req, res) => {
+  try {
+    const settings = db.prepare("SELECT ollamaUrl FROM user_settings WHERE email=?").get(req.user.email);
+    const ollamaUrl = (settings && settings.ollamaUrl) || "http://localhost:11434";
+    const result = await ollamaRequest(ollamaUrl, "/api/tags", "GET");
+    res.json({ ok: result.status === 200 });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post("/api/ollama/chat", auth, async (req, res) => {
+  try {
+    const settings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+    const ollamaUrl = (settings && settings.ollamaUrl) || "http://localhost:11434";
+    const model = req.body.model || (settings && settings.model) || "llama3.2";
+    const messages = req.body.messages || [];
+    const url = new URL("/api/chat", ollamaUrl);
+    const options = { hostname: url.hostname, port: url.port, path: url.pathname, method: "POST", headers: { "Content-Type": "application/json" } };
+    const ollamaReq = http.request(options, (ollamaRes) => {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      ollamaRes.on("data", (chunk) => {
+        const lines = chunk.toString().split("\n").filter(l => l.trim());
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            res.write("data: " + JSON.stringify(parsed) + "\n\n");
+            if (parsed.done) { res.write("data: [DONE]\n\n"); res.end(); }
+          } catch(e) {}
+        }
+      });
+      ollamaRes.on("end", () => { if (!res.writableEnded) { res.write("data: [DONE]\n\n"); res.end(); } });
+      ollamaRes.on("error", () => { if (!res.writableEnded) res.end(); });
+    });
+    ollamaReq.on("error", (e) => { res.status(502).json({ error: "Ollama接続エラー: " + e.message }); });
+    ollamaReq.write(JSON.stringify({ model, messages, stream: true }));
+    ollamaReq.end();
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// --- Local Chat (SQLite-based) ---
+app.post("/api/local/chat/send", auth, async (req, res) => {
+  try {
+    const { message, sessionKey: reqSessionKey, model: reqModel } = req.body;
+    if (!message) return res.status(400).json({ error: "メッセージが必要です" });
+    const settings = db.prepare("SELECT * FROM user_settings WHERE email=?").get(req.user.email);
+    const ollamaUrl = (settings && settings.ollamaUrl) || "http://localhost:11434";
+    const model = reqModel || (settings && settings.model) || "llama3.2";
+    const sessionKey = reqSessionKey || "session-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+    const now = new Date().toISOString();
+
+    // セッション作成/更新
+    const existingSession = db.prepare("SELECT * FROM chat_sessions WHERE sessionKey=?").get(sessionKey);
+    if (!existingSession) {
+      const title = message.length > 30 ? message.slice(0, 30) + "..." : message;
+      db.prepare("INSERT INTO chat_sessions (email, sessionKey, title, createdAt, updatedAt) VALUES (?,?,?,?,?)").run(req.user.email, sessionKey, title, now, now);
+    } else {
+      db.prepare("UPDATE chat_sessions SET updatedAt=? WHERE sessionKey=?").run(now, sessionKey);
+    }
+
+    // ユーザーメッセージ保存
+    db.prepare("INSERT INTO chat_messages (sessionKey, role, content, model, timestamp) VALUES (?,?,?,?,?)").run(sessionKey, "user", message, model, now);
+
+    // 過去メッセージを取得してOllamaに送信
+    const history = db.prepare("SELECT role, content FROM chat_messages WHERE sessionKey=? ORDER BY id").all(sessionKey);
+    const messages = history.map(m => ({ role: m.role, content: m.content }));
+
+    // ストリーミングレスポンス
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.write("data: " + JSON.stringify({ sessionKey }) + "\n\n");
+
+    const url = new URL("/api/chat", ollamaUrl);
+    const options = { hostname: url.hostname, port: url.port, path: url.pathname, method: "POST", headers: { "Content-Type": "application/json" } };
+    let fullResponse = "";
+
+    const ollamaReq = http.request(options, (ollamaRes) => {
+      ollamaRes.on("data", (chunk) => {
+        const lines = chunk.toString().split("\n").filter(l => l.trim());
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            if (parsed.message && parsed.message.content) {
+              fullResponse += parsed.message.content;
+              res.write("data: " + JSON.stringify({ content: parsed.message.content, done: false }) + "\n\n");
+            }
+            if (parsed.done) {
+              // アシスタントメッセージ保存
+              db.prepare("INSERT INTO chat_messages (sessionKey, role, content, model, timestamp) VALUES (?,?,?,?,?)").run(sessionKey, "assistant", fullResponse, model, new Date().toISOString());
+              res.write("data: " + JSON.stringify({ content: "", done: true, sessionKey }) + "\n\n");
+              res.end();
+            }
+          } catch(e) {}
+        }
+      });
+      ollamaRes.on("end", () => { if (!res.writableEnded) { if (fullResponse) { db.prepare("INSERT INTO chat_messages (sessionKey, role, content, model, timestamp) VALUES (?,?,?,?,?)").run(sessionKey, "assistant", fullResponse, model, new Date().toISOString()); } res.write("data: " + JSON.stringify({ done: true, sessionKey }) + "\n\n"); res.end(); } });
+      ollamaRes.on("error", (e) => { res.write("data: " + JSON.stringify({ error: e.message }) + "\n\n"); res.end(); });
+    });
+    ollamaReq.on("error", (e) => { res.write("data: " + JSON.stringify({ error: "Ollama接続エラー: " + e.message }) + "\n\n"); res.end(); });
+    ollamaReq.setTimeout(120000, () => { ollamaReq.destroy(); });
+    ollamaReq.write(JSON.stringify({ model, messages, stream: true }));
+    ollamaReq.end();
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get("/api/local/chat/sessions", auth, (req, res) => {
+  const sessions = db.prepare("SELECT * FROM chat_sessions WHERE email=? ORDER BY updatedAt DESC").all(req.user.email);
+  res.json({ success: true, sessions });
+});
+
+app.get("/api/local/chat/history", auth, (req, res) => {
+  const sessionKey = req.query.sessionKey;
+  if (!sessionKey) return res.status(400).json({ error: "sessionKeyが必要です" });
+  const messages = db.prepare("SELECT * FROM chat_messages WHERE sessionKey=? ORDER BY id").all(sessionKey);
+  res.json({ success: true, messages });
+});
+
+app.delete("/api/local/chat/sessions/:key", auth, (req, res) => {
+  const sessionKey = req.params.key;
+  db.prepare("DELETE FROM chat_messages WHERE sessionKey=?").run(sessionKey);
+  db.prepare("DELETE FROM chat_sessions WHERE sessionKey=? AND email=?").run(sessionKey, req.user.email);
+  res.json({ success: true });
+});
 
 app.get("/api/test-endpoint", (req, res) => {
   res.json({ success: true, message: "Test endpoint works!" });

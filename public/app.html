@@ -2,108 +2,305 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EasyClaw</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EasyClaw — ログイン</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦞</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;450;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#1a1a1a;--surface:#141820;--surface2:#1C2230;--border:#2A3040;--text:#E8ECF4;--text2:#8893A7;--accent:#c47a2a;--success:#34D399;--error:#F87171;--blue:#60A5FA}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.header{padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#FF4500);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.user-info{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:12px}
-.logout-btn{background:none;border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
-.logout-btn:hover{border-color:var(--accent);color:var(--text)}
-.main{max-width:720px;margin:0 auto;padding:40px 24px}
-.hero{text-align:center;margin-bottom:48px}
-.hero h1{font-size:28px;font-weight:800;margin-bottom:12px}
-.hero p{color:var(--text2);font-size:15px}
-.tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--surface);border-radius:12px;padding:4px}
-.tab{flex:1;padding:12px;text-align:center;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text2);border:none;background:none}
-.tab.active{background:var(--surface2);color:var(--text)}
-.panel{display:none}.panel.active{display:block}
-.form-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px}
-.form-section-title{font-size:14px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
+:root{
+--black:#050505;--dark:#0a0a0a;--dark2:#111;--dark3:#1a1a1a;--dark4:#222;
+--text:#e8e8e8;--text2:#888;--text3:#555;
+--green:#00ff41;--green2:#00cc33;--greenDim:rgba(0,255,65,0.08);--greenGlow:rgba(0,255,65,0.15);
+--accent:#e8562a;--accent2:#ff7040;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+::selection{background:var(--greenGlow);color:var(--green)}
+
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.08;pointer-events:none}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.03)}
+.nav-logo{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.3px;text-decoration:none;color:var(--text)}
+.nav-logo span{font-size:18px}
+.nav-links a{color:var(--text2);font-size:13px;text-decoration:none;transition:color .2s;font-weight:400}
+.nav-links a:hover{color:var(--text)}
+
+.auth-container{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;padding:100px 20px 60px}
+
+.auth-card{width:100%;max-width:420px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:40px 36px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:fadeUp .6s ease}
+
+.auth-header{text-align:center;margin-bottom:36px}
+.auth-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px}
+.auth-header p{font-size:13px;color:var(--text2);font-weight:300;letter-spacing:.3px}
+
 .form-group{margin-bottom:20px}
-.form-label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
-.form-hint{font-size:12px;color:var(--text2);opacity:0.7;margin-top:6px}
-.form-input,.form-select{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none}
-.form-input:focus{border-color:var(--accent)}
-.form-select{cursor:pointer}
-.form-select option{background:var(--surface)}
-.btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),#FF4500);color:white}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,53,0.3)}
-.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.btn-sub{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:13px;padding:10px;margin-top:12px}
-.btn-sub:hover{border-color:var(--accent);color:var(--text);transform:none;box-shadow:none}
-.result{margin-top:20px;padding:20px;border-radius:12px;display:none}
-.result.success{display:block;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3)}
-.result.error{display:block;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3)}
-.result-title{font-size:15px;font-weight:700;margin-bottom:8px}
-.result.success .result-title{color:var(--success)}
-.result.error .result-title{color:var(--error)}
-.result-detail{font-size:13px;color:var(--text2);line-height:1.6}
-.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:12px}
-.dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.dash-user{font-size:16px;font-weight:700}
-.dash-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
-.dash-badge.running{background:rgba(52,211,153,0.15);color:var(--success)}
-.dash-badge.stopped{background:rgba(248,113,113,0.15);color:var(--error)}
-.dash-actions{display:flex;gap:8px;margin-top:16px}
-.dash-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2)}
-.dash-btn:hover{border-color:var(--accent);color:var(--text)}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
-.guide-link{color:var(--blue);font-size:12px;text-decoration:none}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px}
+.form-label{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.form-input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus{border-color:rgba(0,255,65,0.3);box-shadow:0 0 0 3px rgba(0,255,65,0.05)}
+.form-input::placeholder{color:var(--text3)}
+
+.btn-primary{display:block;width:100%;padding:16px;border:none;border-radius:980px;font-size:15px;font-weight:500;cursor:pointer;background:var(--accent);color:#fff;font-family:inherit;letter-spacing:.3px;transition:all .25s;margin-top:8px}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,86,42,0.3)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+.switch-link{text-align:center;margin-top:24px;font-size:13px;color:var(--text2)}
+.switch-link a{color:var(--green);cursor:pointer;text-decoration:none;font-weight:500;transition:opacity .2s}
+.switch-link a:hover{opacity:.8}
+
+.alert{padding:14px 18px;border-radius:12px;font-size:13px;margin-bottom:20px;display:none;line-height:1.6}
+.alert.error{display:block;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:#F87171}
+.alert.success{display:block;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.15);color:var(--green)}
+
+.otp-input{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+.otp-input input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:600;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:var(--green);outline:none;transition:border-color .2s}
+.otp-input input:focus{border-color:rgba(0,255,65,0.4);box-shadow:0 0 0 3px rgba(0,255,65,0.08)}
+
+.resend-link{text-align:center;margin-top:16px;font-size:12px;color:var(--text3)}
+.resend-link a{color:var(--text2);cursor:pointer;text-decoration:none;transition:color .2s}
+.resend-link a:hover{color:var(--green)}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.switch-link{color:var(--blue);cursor:pointer;font-size:13px;text-align:center;margin-top:16px}
-.switch-link:hover{text-decoration:underline}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+@media(max-width:480px){
+  .auth-card{padding:32px 24px;border-radius:16px}
+  .auth-header h1{font-size:24px}
+}
 </style>
 </head>
 <body>
-<div class="header"><a href="/" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px"><div class="logo-icon">🦞</div>EasyClaw</a><div class="user-info" id="userInfo" style="display:none"><span id="userEmail"></span><a href="/chat.html" style="text-decoration:none;border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:8px;font-size:12px;margin-right:8px">● チャット</a><button class="logout-btn" onclick="logout()">ログアウト</button></div></div></div>
-<div class="main">
-<div id="authView">
-<div class="hero"><h1>EasyClaw</h1><p>OpenClawを1クリックでデプロイ</p></div>
-<div class="form-section">
-<div class="form-section-title" id="authTitle">🔐 ログイン</div>
-<div class="form-group"><label class="form-label">メールアドレス</label><input type="email" id="authEmail" class="form-input" placeholder="you@example.com"></div>
-<div class="form-group"><label class="form-label">パスワード</label><input type="password" id="authPassword" class="form-input" placeholder="6文字以上"></div>
-<button class="btn" id="authBtn" onclick="doAuth()">ログイン</button>
-<button class="btn btn-sub" id="switchBtn" onclick="switchAuth()">アカウント作成はこちら</button>
-<div id="authResult" class="result"></div>
-</div></div>
-<div id="appView" style="display:none">
-<div class="hero"><h1>OpenClawを1クリックでデプロイ</h1><p>APIキーとBot Tokenを入力するだけ。</p></div>
-<div class="tabs"><button class="tab active" onclick="switchTab('deploy')">🚀 デプロイ</button><button class="tab" onclick="switchTab('dashboard')">📊 ダッシュボード</button></div>
-<div id="panel-deploy" class="panel active">
-<div class="form-section"><div class="form-section-title">🤖 AIモデル設定</div>
-<div class="form-group"><label class="form-label">ユーザーID</label><input type="text" id="userId" class="form-input" placeholder="例: mybot001"><div class="form-hint">半角英数字で入力</div></div>
-<div class="form-group"><label class="form-label">AIプロバイダー</label><select id="apiProvider" class="form-select"><option value="google">Google（Gemini）</option><option value="anthropic">Anthropic（Claude）</option><option value="openai">OpenAI（GPT）</option></select></div>
-<div class="form-group"><label class="form-label">AIモデル</label><select id="model" class="form-select"><option value="google/gemini-2.5-flash">Gemini 2.5 Flash（無料枠あり）</option><option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option><option value="anthropic/claude-sonnet-4-5-20250929">Claude Sonnet 4.5</option><option value="openai/gpt-4o">GPT-4o</option></select></div>
-<div class="form-group"><label class="form-label">APIキー</label><input type="password" id="apiKey" class="form-input" placeholder="APIキーを入力"><div class="form-hint"><a href="https://aistudio.google.com/apikey" target="_blank" class="guide-link">📖 Gemini APIキーの取得方法</a></div></div></div>
-<div class="form-section" style="display:none"><div class="form-section-title">💬 Discord設定</div>
-<div class="form-group"><label class="form-label">Discord Bot Token</label><input type="password" id="discordToken" class="form-input" placeholder="Bot Tokenを入力"><div class="form-hint"><a href="https://discord.com/developers/applications" target="_blank" class="guide-link">📖 Discord Botの作成方法</a></div></div>
-<div class="form-group"><label class="form-label">あなたのDiscord ユーザーID</label><input type="text" id="discordUserId" class="form-input" placeholder="例: 123456789012345678"><div class="form-hint">Discordの設定→詳細設定→開発者モードON→自分のアイコン右クリック→IDコピー</div></div></div>
-<button class="btn" id="deployBtn" onclick="deploy()">🚀 デプロイする</button>
-<div id="result" class="result"><div class="result-title" id="resultTitle"></div><div class="result-detail" id="resultDetail"></div></div></div>
-<div id="panel-dashboard" class="panel"><div id="dashContent"><div class="empty-state"><p>🦞<br><br>読み込み中...</p></div></div></div>
-</div></div>
+<canvas id="matrix-bg"></canvas>
+<nav>
+  <a href="/" class="nav-logo"><span>🦞</span> EasyClaw</a>
+  <div class="nav-links"><a href="/">ホーム</a></div>
+</nav>
+
+<div class="auth-container">
+  <!-- Login View -->
+  <div class="auth-card" id="loginView">
+    <div class="auth-header">
+      <h1>Welcome Back</h1>
+      <p>アカウントにログイン</p>
+    </div>
+    <div id="loginAlert" class="alert"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="loginPassword" class="form-input" placeholder="パスワードを入力" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="loginBtn" onclick="doLogin()">ログイン</button>
+    <div class="switch-link">はじめての方は <a onclick="showView('register')">アカウント作成</a></div>
+  </div>
+
+  <!-- Register View -->
+  <div class="auth-card" id="registerView" style="display:none">
+    <div class="auth-header">
+      <h1>Get Started</h1>
+      <p>無料でアカウントを作成</p>
+    </div>
+    <div id="registerAlert" class="alert"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="registerEmail" class="form-input" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="registerPassword" class="form-input" placeholder="6文字以上" autocomplete="new-password">
+    </div>
+    <button class="btn-primary" id="registerBtn" onclick="doRegister()">アカウント作成</button>
+    <div class="switch-link">アカウントをお持ちの方は <a onclick="showView('login')">ログイン</a></div>
+  </div>
+
+  <!-- OTP View -->
+  <div class="auth-card" id="otpView" style="display:none">
+    <div class="auth-header">
+      <h1>認証コード</h1>
+      <p id="otpEmail">送信されたコードを入力</p>
+    </div>
+    <div id="otpAlert" class="alert"></div>
+    <div class="otp-input" id="otpInputs">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    </div>
+    <button class="btn-primary" id="otpBtn" onclick="doVerifyOTP()">認証する</button>
+    <div class="resend-link">コードが届かない場合 <a onclick="doResendOTP()">再送信</a></div>
+  </div>
+</div>
+
 <script>
-let token=localStorage.getItem('token');
-let email=localStorage.getItem('email');
-let isLogin=true;
-if(token){showApp()}
-function switchAuth(){isLogin=!isLogin;document.getElementById('authTitle').textContent=isLogin?'🔐 ログイン':'📝 アカウント作成';document.getElementById('authBtn').textContent=isLogin?'ログイン':'アカウント作成';document.getElementById('switchBtn').textContent=isLogin?'アカウント作成はこちら':'ログインはこちら'}
-async function doAuth(){const e=document.getElementById('authEmail').value.trim();const p=document.getElementById('authPassword').value;const r=document.getElementById('authResult');if(!e||!p){r.className='result error';r.innerHTML='<div class="result-title">⚠️ 入力エラー</div><div class="result-detail">メールとパスワードを入力してください</div>';return}try{const res=await fetch(isLogin?'/api/login':'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});const d=await res.json();if(d.success){token=d.token;email=d.email;localStorage.setItem('token',token);localStorage.setItem('email',email);showApp()}else{r.className='result error';r.innerHTML='<div class="result-title">❌ エラー</div><div class="result-detail">'+d.error+'</div>'}}catch(err){r.className='result error';r.innerHTML='<div class="result-title">❌ 通信エラー</div>'}}
-function showApp(){document.getElementById('authView').style.display='none';document.getElementById('appView').style.display='block';document.getElementById('userInfo').style.display='flex';document.getElementById('userEmail').textContent=email}
-function logout(){token=null;email=null;localStorage.removeItem('token');localStorage.removeItem('email');document.getElementById('authView').style.display='block';document.getElementById('appView').style.display='none';document.getElementById('userInfo').style.display='none'}
-function switchTab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));if(t==='deploy'){document.querySelectorAll('.tab')[0].classList.add('active');document.getElementById('panel-deploy').classList.add('active')}else{document.querySelectorAll('.tab')[1].classList.add('active');document.getElementById('panel-dashboard').classList.add('active');loadDash()}}
-async function deploy(){const btn=document.getElementById('deployBtn'),r=document.getElementById('result');const data={userId:document.getElementById('userId').value.trim(),apiProvider:document.getElementById('apiProvider').value,apiKey:document.getElementById('apiKey').value.trim(),model:document.getElementById('model').value,discordToken:document.getElementById('discordToken').value.trim(),discordUserId:document.getElementById('discordUserId').value.trim()};if(!data.userId||!data.apiKey){r.className='result error';document.getElementById('resultTitle').textContent='⚠️ 入力エラー';document.getElementById('resultDetail').textContent='全項目入力してください';return}btn.disabled=true;btn.innerHTML='<span class="spinner"></span>デプロイ中...';r.className='result';try{const res=await fetch('/api/deploy',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(data)});const d=await res.json();if(d.success){r.className='result success';document.getElementById('resultTitle').textContent='✅ デプロイ完了！';document.getElementById('resultDetail').innerHTML='ユーザー: '+d.userId+'<br>モデル: '+d.model+'<br>ポート: '+d.port+'<br><br>DiscordでBotにDMを送って会話を始めましょう！'}else{r.className='result error';document.getElementById('resultTitle').textContent='❌ エラー';document.getElementById('resultDetail').textContent=d.error}}catch(e){r.className='result error';document.getElementById('resultTitle').textContent='❌ 通信エラー'}btn.disabled=false;btn.innerHTML='🚀 デプロイする'}
-async function loadDash(){const c=document.getElementById('dashContent');try{const res=await fetch('/api/my-deployment',{headers:{'Authorization':'Bearer '+token}});const d=await res.json();if(!d.exists){c.innerHTML='<div class="empty-state"><p>🦞<br><br>まだデプロイされたBotがありません。<br>「デプロイ」タブから作成しましょう。</p></div>';return}c.innerHTML='<div class="dash-card"><div class="dash-header"><span class="dash-user">'+d.userId+'</span><span class="dash-badge '+(d.running?'running':'stopped')+'">'+(d.running?'🟢 稼働中':'🔴 停止中')+'</span></div><p style="font-size:13px;color:var(--text2)">モデル: '+d.model+'</p><div class="dash-actions"><button class="dash-btn" onclick="stopBot(\''+d.userId+'\')">⏹ 停止</button><button class="dash-btn" onclick="deleteBot(\''+d.userId+'\')">🗑 削除</button></div></div>'}catch(e){c.innerHTML='<div class="empty-state"><p>⚠️ 取得失敗</p></div>'}}
-async function stopBot(id){if(!confirm(id+' を停止しますか？'))return;await fetch('/api/stop/'+id,{method:'POST',headers:{'Authorization':'Bearer '+token}});loadDash()}
-async function startBot(id){await fetch('/api/start/'+id,{method:'POST',headers:{'Authorization':'Bearer '+token}});loadDash()}
-async function deleteBot(id){if(!confirm(id+' を完全に削除しますか？'))return;await fetch('/api/delete/'+id,{method:'POST',headers:{'Authorization':'Bearer '+token}});loadDash()}
+let pendingEmail = "";
+
+// Check existing token on load
+(async function checkToken() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+  try {
+    const res = await fetch("/api/verify-token", { headers: { Authorization: "Bearer " + token } });
+    const data = await res.json();
+    if (data.valid) {
+      if (data.setupCompleted) {
+        location.href = "/chat.html";
+      } else {
+        location.href = "/setup.html";
+      }
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
+    }
+  } catch(e) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+  }
+})();
+
+function showView(view) {
+  document.getElementById("loginView").style.display = view === "login" ? "block" : "none";
+  document.getElementById("registerView").style.display = view === "register" ? "block" : "none";
+  document.getElementById("otpView").style.display = view === "otp" ? "block" : "none";
+}
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.className = "alert " + type;
+  el.textContent = msg;
+}
+
+async function doLogin() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return showAlert("loginAlert", "メールとパスワードを入力してください", "error");
+  const btn = document.getElementById("loginBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>ログイン中...';
+  try {
+    const res = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (data.success && data.needVerify) {
+      pendingEmail = data.email;
+      document.getElementById("otpEmail").textContent = data.email + " に認証コードを送信しました";
+      showView("otp");
+      setupOTPInputs();
+    } else if (data.success && data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", data.email);
+      // Check setup status
+      const vRes = await fetch("/api/verify-token", { headers: { Authorization: "Bearer " + data.token } });
+      const vData = await vRes.json();
+      location.href = vData.setupCompleted ? "/chat.html" : "/setup.html";
+    } else {
+      showAlert("loginAlert", data.error || "ログインに失敗しました", "error");
+    }
+  } catch(e) { showAlert("loginAlert", "通信エラーが発生しました", "error"); }
+  btn.disabled = false; btn.textContent = "ログイン";
+}
+
+async function doRegister() {
+  const email = document.getElementById("registerEmail").value.trim();
+  const password = document.getElementById("registerPassword").value;
+  if (!email || !password) return showAlert("registerAlert", "メールとパスワードを入力してください", "error");
+  if (password.length < 6) return showAlert("registerAlert", "パスワードは6文字以上にしてください", "error");
+  const btn = document.getElementById("registerBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>作成中...';
+  try {
+    const res = await fetch("/api/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (data.success && data.needVerify) {
+      pendingEmail = data.email;
+      document.getElementById("otpEmail").textContent = data.email + " に認証コードを送信しました";
+      showView("otp");
+      setupOTPInputs();
+    } else {
+      showAlert("registerAlert", data.error || "登録に失敗しました", "error");
+    }
+  } catch(e) { showAlert("registerAlert", "通信エラーが発生しました", "error"); }
+  btn.disabled = false; btn.textContent = "アカウント作成";
+}
+
+function setupOTPInputs() {
+  const inputs = document.querySelectorAll("#otpInputs input");
+  inputs.forEach((input, i) => {
+    input.value = "";
+    input.addEventListener("input", (e) => {
+      if (e.target.value && i < inputs.length - 1) inputs[i + 1].focus();
+      if (i === inputs.length - 1 && e.target.value) doVerifyOTP();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !e.target.value && i > 0) inputs[i - 1].focus();
+    });
+    input.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const paste = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "").slice(0, 6);
+      paste.split("").forEach((ch, j) => { if (inputs[j]) inputs[j].value = ch; });
+      if (paste.length === 6) doVerifyOTP();
+    });
+  });
+  inputs[0].focus();
+}
+
+async function doVerifyOTP() {
+  const inputs = document.querySelectorAll("#otpInputs input");
+  const code = Array.from(inputs).map(i => i.value).join("");
+  if (code.length !== 6) return showAlert("otpAlert", "6桁のコードを入力してください", "error");
+  const btn = document.getElementById("otpBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>認証中...';
+  try {
+    const res = await fetch("/api/verify-otp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: pendingEmail, code }) });
+    const data = await res.json();
+    if (data.success && data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", data.email);
+      location.href = "/setup.html";
+    } else {
+      showAlert("otpAlert", data.error || "認証に失敗しました", "error");
+    }
+  } catch(e) { showAlert("otpAlert", "通信エラーが発生しました", "error"); }
+  btn.disabled = false; btn.textContent = "認証する";
+}
+
+async function doResendOTP() {
+  try {
+    await fetch("/api/resend-otp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: pendingEmail }) });
+    showAlert("otpAlert", "認証コードを再送信しました", "success");
+  } catch(e) { showAlert("otpAlert", "再送信に失敗しました", "error"); }
+}
+
+// Enter key support
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  if (document.getElementById("loginView").style.display !== "none") doLogin();
+  else if (document.getElementById("registerView").style.display !== "none") doRegister();
+});
+
+// Matrix rain
+(function() {
+  const c = document.getElementById("matrix-bg"), ctx = c.getContext("2d");
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener("resize", resize);
+  const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const fontSize = 14, columns = Math.floor(window.innerWidth / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = "rgba(5,5,5,0.15)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#00ff41";
+    ctx.font = fontSize + "px 'JetBrains Mono', monospace";
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 45);
+})();
 </script>
 </body>
 </html>

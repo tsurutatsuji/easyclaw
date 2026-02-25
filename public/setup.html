@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EasyClaw — セットアップ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦞</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;450;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--black:#050505;--dark:#0a0a0a;--dark2:#111;--dark3:#1a1a1a;--dark4:#222;
+--text:#e8e8e8;--text2:#888;--text3:#555;
+--green:#00ff41;--green2:#00cc33;--greenDim:rgba(0,255,65,0.08);--greenGlow:rgba(0,255,65,0.15);
+--accent:#e8562a;--accent2:#ff7040;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh}
+::selection{background:var(--greenGlow);color:var(--green)}
+
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.06;pointer-events:none}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.03)}
+.nav-logo{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.3px;text-decoration:none;color:var(--text)}
+.nav-user{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+
+.setup-container{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:100px 20px 60px}
+
+.setup-header{text-align:center;margin-bottom:48px;animation:fadeUp .6s ease}
+.setup-header h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,40px);font-weight:600;letter-spacing:-1px;margin-bottom:12px}
+.setup-header p{font-size:14px;color:var(--text2);font-weight:300;letter-spacing:.3px}
+
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:40px;animation:fadeUp .6s ease .1s both}
+.step{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,0.1);color:var(--text3);transition:all .3s}
+.step.active{background:var(--green);color:var(--black);border-color:var(--green);box-shadow:0 0 20px rgba(0,255,65,0.2)}
+.step.done{background:rgba(0,255,65,0.1);color:var(--green);border-color:rgba(0,255,65,0.3)}
+.step-line{width:40px;height:1px;background:rgba(255,255,255,0.08)}
+
+.provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;animation:fadeUp .6s ease .2s both}
+.provider-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px 20px;cursor:pointer;transition:all .3s;position:relative}
+.provider-card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-2px)}
+.provider-card.selected{border-color:rgba(0,255,65,0.4);background:rgba(0,255,65,0.03);box-shadow:0 0 30px rgba(0,255,65,0.05)}
+.provider-card.recommended::after{content:'おすすめ';position:absolute;top:12px;right:12px;font-size:9px;font-weight:600;color:var(--green);background:rgba(0,255,65,0.1);padding:3px 10px;border-radius:980px;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.provider-icon{font-size:28px;margin-bottom:12px}
+.provider-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.provider-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.provider-free{font-size:10px;color:var(--green);font-weight:500;margin-top:8px;font-family:'JetBrains Mono',monospace}
+
+.config-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;margin-bottom:24px;animation:fadeUp .6s ease .3s both}
+.config-title{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:20px}
+
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.form-input,.form-select{width:100%;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-input:focus,.form-select:focus{border-color:rgba(0,255,65,0.3);box-shadow:0 0 0 3px rgba(0,255,65,0.05)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.form-select option{background:var(--dark2)}
+.form-hint{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
+.form-hint a{color:var(--green);text-decoration:none}
+
+.test-row{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.test-btn{padding:10px 24px;border:1px solid rgba(255,255,255,0.1);border-radius:980px;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
+.test-btn:hover{border-color:var(--green);color:var(--green)}
+.test-status{font-size:13px;font-family:'JetBrains Mono',monospace}
+.test-status.ok{color:var(--green)}
+.test-status.fail{color:#F87171}
+.test-status.loading{color:var(--text3)}
+
+.btn-primary{display:block;width:100%;padding:18px;border:none;border-radius:980px;font-size:16px;font-weight:500;cursor:pointer;background:var(--accent);color:#fff;font-family:inherit;letter-spacing:.3px;transition:all .25s;animation:fadeUp .6s ease .4s both}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,86,42,0.3)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+@media(max-width:480px){
+  .provider-grid{grid-template-columns:1fr}
+  .config-section{padding:20px}
+}
+</style>
+</head>
+<body>
+<canvas id="matrix-bg"></canvas>
+<nav>
+  <a href="/" class="nav-logo"><span>🦞</span> EasyClaw</a>
+  <span class="nav-user" id="navUser"></span>
+</nav>
+
+<div class="setup-container">
+  <div class="setup-header">
+    <h1>Setup</h1>
+    <p>AIプロバイダーを選択してチャットを始めましょう</p>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step done">1</div>
+    <div class="step-line"></div>
+    <div class="step active">2</div>
+    <div class="step-line"></div>
+    <div class="step">3</div>
+  </div>
+
+  <div class="provider-grid">
+    <div class="provider-card recommended selected" onclick="selectProvider('ollama')">
+      <div class="provider-icon">🦙</div>
+      <div class="provider-name">Ollama</div>
+      <div class="provider-desc">ローカルで動作するAI。プライバシー重視。</div>
+      <div class="provider-free">無料 / ローカル実行</div>
+    </div>
+    <div class="provider-card" onclick="selectProvider('google')">
+      <div class="provider-icon">✨</div>
+      <div class="provider-name">Google Gemini</div>
+      <div class="provider-desc">Googleの最新AIモデル。</div>
+      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
+    </div>
+    <div class="provider-card" onclick="selectProvider('anthropic')">
+      <div class="provider-icon">🧠</div>
+      <div class="provider-name">Anthropic Claude</div>
+      <div class="provider-desc">高精度な推論が得意。</div>
+      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
+    </div>
+    <div class="provider-card" onclick="selectProvider('openai')">
+      <div class="provider-icon">🤖</div>
+      <div class="provider-name">OpenAI GPT</div>
+      <div class="provider-desc">GPT-4oなど最新モデル。</div>
+      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
+    </div>
+  </div>
+
+  <!-- Ollama Config -->
+  <div class="config-section" id="ollamaConfig">
+    <div class="config-title">Ollama 設定</div>
+    <div class="form-group">
+      <label class="form-label">Ollama URL</label>
+      <input type="text" id="ollamaUrl" class="form-input" value="http://localhost:11434" placeholder="http://localhost:11434">
+    </div>
+    <div class="form-group">
+      <label class="form-label">モデル</label>
+      <select id="ollamaModel" class="form-select">
+        <option value="">読み込み中...</option>
+      </select>
+      <div class="form-hint">Ollamaにインストール済みのモデルが表示されます。<br>未インストールの場合: <a href="https://ollama.com" target="_blank">ollama.com</a> からダウンロード</div>
+    </div>
+    <div class="test-row">
+      <button class="test-btn" onclick="testConnection()">接続テスト</button>
+      <span class="test-status" id="testStatus"></span>
+    </div>
+  </div>
+
+  <!-- API Config -->
+  <div class="config-section" id="apiConfig" style="display:none">
+    <div class="config-title" id="apiConfigTitle">API 設定</div>
+    <div class="form-group">
+      <label class="form-label">APIキー</label>
+      <input type="password" id="apiKey" class="form-input" placeholder="APIキーを入力">
+    </div>
+    <div class="form-group">
+      <label class="form-label">モデル</label>
+      <select id="apiModel" class="form-select">
+        <option value="">プロバイダーを選択してください</option>
+      </select>
+    </div>
+    <div class="test-row">
+      <button class="test-btn" onclick="testConnection()">接続テスト</button>
+      <span class="test-status" id="testStatusApi"></span>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="saveBtn" onclick="saveSettings()">チャットを始める</button>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+const email = localStorage.getItem("email");
+if (!token) location.href = "/app.html";
+if (email) document.getElementById("navUser").textContent = email;
+
+let currentProvider = "ollama";
+
+const API_MODELS = {
+  google: [
+    { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+    { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" }
+  ],
+  anthropic: [
+    { value: "anthropic/claude-sonnet-4-5-20250929", label: "Claude Sonnet 4.5" },
+    { value: "anthropic/claude-haiku-3-5-20241022", label: "Claude Haiku 3.5" }
+  ],
+  openai: [
+    { value: "openai/gpt-4o", label: "GPT-4o" },
+    { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" }
+  ]
+};
+
+function selectProvider(provider) {
+  currentProvider = provider;
+  document.querySelectorAll(".provider-card").forEach(c => c.classList.remove("selected"));
+  event.currentTarget.classList.add("selected");
+
+  if (provider === "ollama") {
+    document.getElementById("ollamaConfig").style.display = "block";
+    document.getElementById("apiConfig").style.display = "none";
+    loadOllamaModels();
+  } else {
+    document.getElementById("ollamaConfig").style.display = "none";
+    document.getElementById("apiConfig").style.display = "block";
+    const names = { google: "Google Gemini", anthropic: "Anthropic Claude", openai: "OpenAI GPT" };
+    document.getElementById("apiConfigTitle").textContent = (names[provider] || provider) + " 設定";
+    const sel = document.getElementById("apiModel");
+    sel.innerHTML = "";
+    (API_MODELS[provider] || []).forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.value; opt.textContent = m.label;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+async function loadOllamaModels() {
+  const sel = document.getElementById("ollamaModel");
+  sel.innerHTML = '<option value="">読み込み中...</option>';
+  try {
+    const res = await fetch("/api/ollama/models", { headers: { Authorization: "Bearer " + token } });
+    const data = await res.json();
+    if (data.success && data.models.length > 0) {
+      sel.innerHTML = "";
+      data.models.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.name; opt.textContent = m.name + " (" + formatSize(m.size) + ")";
+        sel.appendChild(opt);
+      });
+    } else {
+      sel.innerHTML = '<option value="llama3.2">llama3.2 (デフォルト)</option>';
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="llama3.2">llama3.2 (デフォルト)</option>';
+  }
+}
+
+function formatSize(bytes) {
+  if (!bytes) return "";
+  const gb = bytes / (1024 * 1024 * 1024);
+  return gb >= 1 ? gb.toFixed(1) + "GB" : (bytes / (1024 * 1024)).toFixed(0) + "MB";
+}
+
+async function testConnection() {
+  const statusEl = currentProvider === "ollama" ? document.getElementById("testStatus") : document.getElementById("testStatusApi");
+  statusEl.className = "test-status loading";
+  statusEl.textContent = "接続中...";
+
+  if (currentProvider === "ollama") {
+    try {
+      const res = await fetch("/api/ollama/health", { headers: { Authorization: "Bearer " + token } });
+      const data = await res.json();
+      if (data.ok) {
+        statusEl.className = "test-status ok";
+        statusEl.textContent = "接続成功";
+        loadOllamaModels();
+      } else {
+        statusEl.className = "test-status fail";
+        statusEl.textContent = "接続失敗 - Ollamaが起動していません";
+      }
+    } catch(e) {
+      statusEl.className = "test-status fail";
+      statusEl.textContent = "接続エラー";
+    }
+  } else {
+    // API key validation - just check if entered
+    const apiKey = document.getElementById("apiKey").value.trim();
+    if (apiKey) {
+      statusEl.className = "test-status ok";
+      statusEl.textContent = "APIキー設定済み";
+    } else {
+      statusEl.className = "test-status fail";
+      statusEl.textContent = "APIキーを入力してください";
+    }
+  }
+}
+
+async function saveSettings() {
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>保存中...';
+
+  const body = { provider: currentProvider };
+  if (currentProvider === "ollama") {
+    body.ollamaUrl = document.getElementById("ollamaUrl").value.trim() || "http://localhost:11434";
+    body.model = document.getElementById("ollamaModel").value || "llama3.2";
+  } else {
+    body.apiKey = document.getElementById("apiKey").value.trim();
+    body.model = document.getElementById("apiModel").value;
+    if (!body.apiKey) {
+      btn.disabled = false; btn.textContent = "チャットを始める";
+      return alert("APIキーを入力してください");
+    }
+  }
+
+  try {
+    const res = await fetch("/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+      location.href = "/chat.html";
+    } else {
+      alert("保存に失敗しました");
+    }
+  } catch(e) { alert("通信エラー"); }
+  btn.disabled = false; btn.textContent = "チャットを始める";
+}
+
+// Init
+loadOllamaModels();
+
+// Matrix rain
+(function() {
+  const c = document.getElementById("matrix-bg"), ctx = c.getContext("2d");
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener("resize", resize);
+  const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789";
+  const fontSize = 14, columns = Math.floor(window.innerWidth / fontSize);
+  const drops = Array(columns).fill(1);
+  function draw() {
+    ctx.fillStyle = "rgba(5,5,5,0.15)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#00ff41";
+    ctx.font = fontSize + "px 'JetBrains Mono', monospace";
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+</script>
+</body>
+</html>
