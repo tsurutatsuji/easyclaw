@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APIキーの取得方法 - EasyClaw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050508;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.08);--text:#F0F0F5;--text2:rgba(240,240,245,0.55);--accent:#FF5722;--accent2:#FF7A50;--success:#4ADE80;--blue:#60A5FA;--cyan:#00E5FF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.8}
+.grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0}
+.header{position:fixed;top:0;left:0;width:100%;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(5,5,8,0.8);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;cursor:pointer;text-decoration:none;color:var(--text);letter-spacing:-0.5px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#FF8A65);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(255,87,34,0.15)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:13px;text-decoration:none;font-weight:500;transition:color .2s;font-family:'Space Mono',monospace}
+.back-btn:hover{color:var(--text)}
+.main{max-width:720px;margin:0 auto;padding:80px 24px 40px;position:relative;z-index:1}
+h1{font-size:28px;font-weight:800;margin-bottom:8px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:32px}
+
+/* タブ */
+.tabs{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap}
+.tab{padding:12px 24px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{border-color:var(--accent);background:rgba(255,87,34,0.1);color:var(--accent)}
+.tab-icon{font-size:18px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ステップ */
+.step{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#FF4500);color:white;font-size:14px;font-weight:800;margin-right:12px}
+.step h2{display:inline;font-size:18px;font-weight:700;vertical-align:middle}
+.step p{margin-top:12px;color:var(--text2);font-size:14px}
+.step a{color:var(--blue);text-decoration:none}
+.step a:hover{text-decoration:underline}
+.step .url-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-top:10px;font-family:monospace;font-size:13px;color:var(--accent);word-break:break-all;display:flex;align-items:center;justify-content:space-between}
+.tip{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:13px;color:var(--success)}
+.warning{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:13px;color:#F87171}
+.info{background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:13px;color:var(--blue)}
+.copy-btn{display:inline-block;margin-left:8px;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);white-space:nowrap}
+.copy-btn:hover{border-color:var(--accent);color:var(--text)}
+ol{margin-top:12px;padding-left:20px;color:var(--text2);font-size:14px}
+ol li{margin-bottom:10px}
+.cost-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.cost-table th,.cost-table td{padding:10px 14px;border:1px solid var(--border);text-align:left}
+.cost-table th{background:var(--surface2);color:var(--text);font-weight:600}
+.cost-table td{color:var(--text2)}
+.recommend{color:var(--success);font-weight:700;font-size:12px;margin-left:6px}
+.footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);color:var(--text2);font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="header">
+  <a href="/app.html" class="back-btn">← アプリに戻る</a>
+  <a href="/" class="logo"><div class="logo-icon">🦞</div>EasyClaw</a>
+  <div style="width:60px"></div>
+</div>
+<div class="main">
+<h1>🔑 APIキーの取得方法</h1>
+<p class="subtitle">EasyClawでAI Botを動かすにはAIプロバイダーのAPIキーが必要です。<br>お好きなプロバイダーを選んで、手順に従ってAPIキーを取得してください。所要時間：約3〜5分</p>
+
+<!-- タブ -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('gemini')"><span class="tab-icon">💎</span>Google Gemini<span class="recommend">おすすめ</span></div>
+  <div class="tab" onclick="showTab('openai')"><span class="tab-icon">🤖</span>OpenAI (ChatGPT)</div>
+  <div class="tab" onclick="showTab('claude')"><span class="tab-icon">🧠</span>Anthropic Claude</div>
+</div>
+
+<!-- ============ Gemini ============ -->
+<div id="tab-gemini" class="tab-content active">
+
+<div class="step">
+  <span class="step-num">1</span><h2>Google AI Studioにアクセス</h2>
+  <p>以下のURLにアクセスしてください。Googleアカウントでログインします。</p>
+  <div class="url-box">
+    <span>https://aistudio.google.com/apikey</span>
+    <button class="copy-btn" onclick="copyText('https://aistudio.google.com/apikey')">コピー</button>
+  </div>
+</div>
+
+<div class="step">
+  <span class="step-num">2</span><h2>APIキーを作成</h2>
+  <ol>
+    <li>ページ上部の「<strong>APIキーを作成</strong>」（Create API Key）ボタンをクリック</li>
+    <li>プロジェクトを選択（新しいプロジェクトでOK）</li>
+    <li>APIキーが生成されます</li>
+  </ol>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span><h2>APIキーをコピー</h2>
+  <p>表示されたAPIキー（<code>AIza...</code>で始まる文字列）をコピーしてください。</p>
+  <div class="warning">⚠️ APIキーは一度しか表示されない場合があります。必ずコピーして安全な場所に保存してください。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span><h2>EasyClawに貼り付け</h2>
+  <ol>
+    <li>EasyClawのBot設定画面に戻る</li>
+    <li>AIプロバイダーで「<strong>Google (Gemini)</strong>」を選択</li>
+    <li>「APIキー」欄にコピーしたキーを貼り付け</li>
+    <li>AIモデルは「<strong>Gemini 2.5 Flash（推奨）</strong>」がおすすめ</li>
+  </ol>
+</div>
+
+<div class="tip">💡 <strong>Geminiがおすすめな理由：</strong>無料枠が大きく（1日1,500リクエスト）、初めての方でも安心して試せます。まずはGeminiで始めて、慣れたら他のモデルも試してみてください。</div>
+
+<table class="cost-table" style="margin-top:20px">
+  <tr><th>モデル</th><th>特徴</th><th>料金目安</th></tr>
+  <tr><td>Gemini 2.5 Flash</td><td>高速・低コスト・日常使いに最適</td><td>無料枠あり / 超過後も格安</td></tr>
+  <tr><td>Gemini 2.5 Pro</td><td>高性能・複雑なタスク向け</td><td>従量課金</td></tr>
+</table>
+
+</div>
+
+<!-- ============ OpenAI ============ -->
+<div id="tab-openai" class="tab-content">
+
+<div class="step">
+  <span class="step-num">1</span><h2>OpenAIアカウントを作成</h2>
+  <p>以下のURLにアクセスして、アカウントを作成またはログインしてください。</p>
+  <div class="url-box">
+    <span>https://platform.openai.com/signup</span>
+    <button class="copy-btn" onclick="copyText('https://platform.openai.com/signup')">コピー</button>
+  </div>
+</div>
+
+<div class="step">
+  <span class="step-num">2</span><h2>クレジットを追加（必須）</h2>
+  <p>OpenAIのAPIは前払い制です。最初に$5〜程度のクレジットを購入する必要があります。</p>
+  <ol>
+    <li>ログイン後、左メニューの「<strong>Settings</strong>」→「<strong>Billing</strong>」をクリック</li>
+    <li>「<strong>Add payment method</strong>」でクレジットカードを登録</li>
+    <li>「<strong>Add credits</strong>」で$5〜$10程度チャージ</li>
+  </ol>
+  <div class="info">ℹ️ ChatGPT Plus（月額$20）のサブスクリプションとAPIは別物です。APIは従量課金で、別途クレジットの追加が必要です。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span><h2>APIキーを作成</h2>
+  <p>以下のURLにアクセスしてAPIキーを作成します。</p>
+  <div class="url-box">
+    <span>https://platform.openai.com/api-keys</span>
+    <button class="copy-btn" onclick="copyText('https://platform.openai.com/api-keys')">コピー</button>
+  </div>
+  <ol>
+    <li>「<strong>+ Create new secret key</strong>」をクリック</li>
+    <li>名前をつける（例: easyclaw）</li>
+    <li>「<strong>Create secret key</strong>」をクリック</li>
+  </ol>
+  <div class="warning">⚠️ APIキー（<code>sk-...</code>で始まる文字列）は一度しか表示されません！必ずコピーしてください。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span><h2>EasyClawに貼り付け</h2>
+  <ol>
+    <li>EasyClawのBot設定画面に戻る</li>
+    <li>AIプロバイダーで「<strong>OpenAI</strong>」を選択</li>
+    <li>「APIキー」欄にコピーしたキーを貼り付け</li>
+    <li>AIモデルは「<strong>GPT-4o mini（推奨）</strong>」がコスパ最強</li>
+  </ol>
+</div>
+
+<table class="cost-table" style="margin-top:20px">
+  <tr><th>モデル</th><th>特徴</th><th>料金目安</th></tr>
+  <tr><td>GPT-4o mini</td><td>高速・低コスト・日常使いに最適</td><td>〜$0.15 / 100万トークン</td></tr>
+  <tr><td>GPT-4o</td><td>高性能・複雑なタスク向け</td><td>〜$2.50 / 100万トークン</td></tr>
+</table>
+
+</div>
+
+<!-- ============ Claude ============ -->
+<div id="tab-claude" class="tab-content">
+
+<div class="step">
+  <span class="step-num">1</span><h2>Anthropicアカウントを作成</h2>
+  <p>以下のURLにアクセスして、アカウントを作成またはログインしてください。</p>
+  <div class="url-box">
+    <span>https://console.anthropic.com/</span>
+    <button class="copy-btn" onclick="copyText('https://console.anthropic.com/')">コピー</button>
+  </div>
+</div>
+
+<div class="step">
+  <span class="step-num">2</span><h2>クレジットを追加（必須）</h2>
+  <p>AnthropicのAPIも前払い制です。最初に$5〜程度のクレジットを購入する必要があります。</p>
+  <ol>
+    <li>ログイン後、左メニューの「<strong>Plans & Billing</strong>」をクリック</li>
+    <li>「<strong>Add payment method</strong>」でクレジットカードを登録</li>
+    <li>クレジットを追加（$5〜$10程度）</li>
+  </ol>
+  <div class="info">ℹ️ Claude Pro（月額$20）のサブスクリプションとAPIは別物です。APIは従量課金で、別途クレジットの追加が必要です。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span><h2>APIキーを作成</h2>
+  <p>以下のURLにアクセスしてAPIキーを作成します。</p>
+  <div class="url-box">
+    <span>https://console.anthropic.com/settings/keys</span>
+    <button class="copy-btn" onclick="copyText('https://console.anthropic.com/settings/keys')">コピー</button>
+  </div>
+  <ol>
+    <li>「<strong>+ Create Key</strong>」をクリック</li>
+    <li>名前をつける（例: easyclaw）</li>
+    <li>「<strong>Create Key</strong>」をクリック</li>
+  </ol>
+  <div class="warning">⚠️ APIキー（<code>sk-ant-...</code>で始まる文字列）は一度しか表示されません！必ずコピーしてください。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span><h2>EasyClawに貼り付け</h2>
+  <ol>
+    <li>EasyClawのBot設定画面に戻る</li>
+    <li>AIプロバイダーで「<strong>Anthropic (Claude)</strong>」を選択</li>
+    <li>「APIキー」欄にコピーしたキーを貼り付け</li>
+    <li>AIモデルは「<strong>Claude Haiku 4.5（推奨）</strong>」がコスパ最強</li>
+  </ol>
+</div>
+
+<table class="cost-table" style="margin-top:20px">
+  <tr><th>モデル</th><th>特徴</th><th>料金目安</th></tr>
+  <tr><td>Claude Haiku 4.5</td><td>高速・低コスト・日常使いに最適</td><td>〜$0.25 / 100万トークン</td></tr>
+  <tr><td>Claude Sonnet 4.5</td><td>バランス型・高性能</td><td>〜$3.00 / 100万トークン</td></tr>
+</table>
+
+</div>
+
+<!-- 共通FAQ -->
+<div class="step" style="margin-top:40px">
+  <h2>❓ よくある質問</h2>
+  <p style="margin-top:16px"><strong>Q. APIキーの料金が心配です</strong></p>
+  <p>A. Geminiなら無料枠があるので安心です。OpenAI・Claudeも$5あれば数千回の会話ができます。使いすぎが心配な場合は、各プロバイダーの設定で利用上限を設定できます。</p>
+  <p style="margin-top:16px"><strong>Q. どのプロバイダーがおすすめですか？</strong></p>
+  <p>A. <strong>まずはGeminiがおすすめです。</strong>無料枠が大きく、APIキーの取得も簡単です。慣れてきたらOpenAIやClaudeも試してみてください。</p>
+  <p style="margin-top:16px"><strong>Q. APIキーは後から変更できますか？</strong></p>
+  <p>A. はい。ダッシュボードのBot設定からいつでも変更可能です。</p>
+  <p style="margin-top:16px"><strong>Q. APIキーが漏れたらどうなりますか？</strong></p>
+  <p>A. 第三者に使われて課金される可能性があります。漏洩した場合はすぐにプロバイダーのダッシュボードからキーを無効化し、新しいキーを作成してください。EasyClawではAPIキーは暗号化して保存しています。</p>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>© 2026 EasyClaw</p>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    btn.textContent = 'コピー済み ✓';
+    setTimeout(() => btn.textContent = 'コピー', 1500);
+  });
+}
+// URLハッシュでタブ切り替え
+if (location.hash) {
+  const h = location.hash.replace('#','');
+  const tab = document.querySelector('.tab[onclick*="' + h + '"]');
+  if (tab) { tab.click(); }
+}
+</script>
+</body>
+</html>

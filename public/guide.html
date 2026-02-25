@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discord Botの作り方 - EasyClaw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050508;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.08);--text:#F0F0F5;--text2:rgba(240,240,245,0.55);--accent:#FF5722;--accent2:#FF7A50;--success:#4ADE80;--blue:#60A5FA;--cyan:#00E5FF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.8}
+.grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0}
+.header{position:fixed;top:0;left:0;width:100%;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(5,5,8,0.8);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;cursor:pointer;text-decoration:none;color:var(--text);letter-spacing:-0.5px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#FF8A65);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(255,87,34,0.15)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:13px;text-decoration:none;font-weight:500;transition:color .2s;font-family:'Space Mono',monospace}
+.back-btn:hover{color:var(--text)}
+.main{max-width:720px;margin:0 auto;padding:80px 24px 40px;position:relative;z-index:1}
+h1{font-size:28px;font-weight:800;margin-bottom:8px}
+.subtitle{color:var(--text2);font-size:15px;margin-bottom:40px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#FF4500);color:white;font-size:14px;font-weight:800;margin-right:12px}
+.step h2{display:inline;font-size:18px;font-weight:700;vertical-align:middle}
+.step p{margin-top:12px;color:var(--text2);font-size:14px}
+.step a{color:var(--blue);text-decoration:none}
+.step a:hover{text-decoration:underline}
+.step .url-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-top:10px;font-family:monospace;font-size:13px;color:var(--accent);word-break:break-all}
+.step img{max-width:100%;border-radius:8px;margin-top:12px;border:1px solid var(--border)}
+.tip{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:13px;color:var(--success)}
+.warning{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:13px;color:#F87171}
+.copy-btn{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2)}
+.copy-btn:hover{border-color:var(--accent);color:var(--text)}
+ol{margin-top:12px;padding-left:20px;color:var(--text2);font-size:14px}
+ol li{margin-bottom:8px}
+.footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);color:var(--text2);font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="header">
+  <a href="javascript:window.close()" class="back-btn">← 閉じる</a>
+  <a href="/" class="logo"><div class="logo-icon">🦞</div>EasyClaw</a>
+  <div style="width:60px"></div>
+</div>
+<div class="main">
+<h1>🤖 Discord Botの作り方</h1>
+<p class="subtitle">EasyClawでAI Botをデプロイするために必要な「Bot Token」と「ユーザーID」の取得方法を解説します。所要時間：約5分</p>
+
+<div class="step">
+  <span class="step-num">1</span><h2>Discord Developer Portalにアクセス</h2>
+  <p>まず、以下のURLにアクセスしてDiscordにログインしてください。</p>
+  <div class="url-box"><a href="https://discord.com/developers/applications" target="_blank">https://discord.com/developers/applications</a></div>
+</div>
+
+<div class="step">
+  <span class="step-num">2</span><h2>新しいアプリケーションを作成</h2>
+  <ol>
+    <li>右上の <strong>「New Application」</strong> ボタンをクリック</li>
+    <li>名前を入力（例: 「My AI Bot」「EasyClaw Bot」など好きな名前）</li>
+    <li><strong>「Create」</strong> をクリック</li>
+  </ol>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span><h2>Botを作成してTokenを取得</h2>
+  <ol>
+    <li>左メニューの <strong>「Bot」</strong> をクリック</li>
+    <li><strong>「Reset Token」</strong> ボタンをクリック</li>
+    <li>表示されたTokenを <strong>コピーして安全な場所に保存</strong></li>
+  </ol>
+  <div class="warning">⚠️ Tokenは一度しか表示されません！必ずコピーしてメモ帳などに保存してください。紛失した場合は再度Reset Tokenで再生成できます。</div>
+  <div class="tip">💡 このTokenがEasyClawの「Discord Bot Token」に入力するものです。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span><h2>Botの権限を設定</h2>
+  <p>同じ「Bot」ページで以下の設定を行います：</p>
+  <ol>
+    <li><strong>「MESSAGE CONTENT INTENT」</strong> をONにする（重要！）</li>
+    <li><strong>「SERVER MEMBERS INTENT」</strong> をONにする</li>
+    <li><strong>「PRESENCE INTENT」</strong> をONにする</li>
+    <li>ページ下部の <strong>「Save Changes」</strong> をクリック</li>
+  </ol>
+  <div class="warning">⚠️ MESSAGE CONTENT INTENTをONにしないと、BotがメッセージをDMで読めなくなります。必ずONにしてください。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">5</span><h2>BotをDiscordサーバーに招待</h2>
+  <ol>
+    <li>左メニューの <strong>「OAuth2」</strong> をクリック</li>
+    <li><strong>「URL Generator」</strong> をクリック</li>
+    <li>SCOPESで <strong>「bot」</strong> にチェック</li>
+    <li>BOT PERMISSIONSで <strong>「Administrator」</strong> にチェック（簡単のため）</li>
+    <li>生成されたURLをコピーしてブラウザで開く</li>
+    <li>Botを追加するサーバーを選んで <strong>「認証」</strong></li>
+  </ol>
+  <div class="tip">💡 BotはDM（ダイレクトメッセージ）で会話できるので、サーバーに入れなくてもDMだけで使えます。ただし、Botと同じサーバーに1つは所属している必要があります。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">6</span><h2>あなたのDiscord ユーザーIDを取得</h2>
+  <ol>
+    <li>Discordアプリを開く</li>
+    <li><strong>「ユーザー設定」</strong>（左下の歯車アイコン）→ <strong>「詳細設定」</strong></li>
+    <li><strong>「開発者モード」</strong> をONにする</li>
+    <li>設定を閉じて、自分のアイコンを <strong>右クリック</strong></li>
+    <li><strong>「IDをコピー」</strong> をクリック</li>
+  </ol>
+  <div class="tip">💡 このIDがEasyClawの「Discord ユーザーID」に入力するものです。数字18桁くらいの文字列です。</div>
+</div>
+
+<div class="step">
+  <span class="step-num">✓</span><h2>準備完了</h2>
+  <p>以下の2つが揃ったら EasyClawに戻って入力してください</p>
+  <ol>
+    <li>✅ <strong>Bot Token</strong> (ステップ3で取得)</li>
+    <li>✅ <strong>あなたのDiscord ユーザーID</strong> (ステップ6で取得)</li>
+  </ol>
+  <p style="margin-top:20px;text-align:right"><a href="javascript:window.close()" style="color:var(--text2);font-size:13px;text-decoration:none;font-family:'Space Mono',monospace;transition:color .2s">← 閉じる</a></p>
+</div>
+</div>
+<footer class="footer">© 2026 EasyClaw. All rights reserved.</footer>
+</body>
+</html>

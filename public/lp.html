@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EasyClaw — Always On</title>
+<meta name="description" content="ChatGPT Claude Geminiを一つに セットアップ不要 3分で起動する24時間AIアシスタント">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦞</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;450;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--black:#050505;--dark:#0a0a0a;--dark2:#111;--dark3:#1a1a1a;--dark4:#222;
+--text:#e8e8e8;--text2:#888;--text3:#555;
+--green:#00ff41;--green2:#00cc33;--greenDim:rgba(0,255,65,0.08);--greenGlow:rgba(0,255,65,0.15);
+--accent:#e8562a;--accent2:#ff7040;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans JP',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--greenGlow);color:var(--green)}
+
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.12;pointer-events:none}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(5,5,5,0.75);border-bottom:1px solid rgba(255,255,255,0.03)}
+.nav-logo{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.3px}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{color:var(--text2);font-size:13px;text-decoration:none;transition:color .2s;font-weight:400;letter-spacing:.1px}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff!important;padding:8px 22px;border-radius:980px;font-size:13px;font-weight:500;letter-spacing:.2px;transition:all .2s}
+.nav-cta:hover{background:var(--accent2)}
+
+section{position:relative;z-index:1}
+
+.hero{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 20px 80px;position:relative}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(transparent,var(--black));pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:980px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-bottom:32px;letter-spacing:1px;animation:fadeUp .8s ease}
+.hero-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(48px,9vw,96px);font-weight:700;line-height:1.0;letter-spacing:-3px;margin-bottom:24px;animation:fadeUp .8s ease .1s both;font-feature-settings:'kern' 1,'liga' 1}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(13px,1.6vw,16px);color:var(--text2);max-width:460px;line-height:1.9;font-weight:300;letter-spacing:.5px;margin-bottom:48px;animation:fadeUp .8s ease .2s both}
+.hero-actions{animation:fadeUp .8s ease .3s both}
+.btn-primary{display:inline-block;background:var(--accent);color:#fff;padding:16px 44px;border-radius:980px;font-size:15px;font-weight:500;letter-spacing:.3px;text-decoration:none;transition:all .25s;font-family:inherit}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,86,42,0.3)}
+.hero-note{margin-top:20px;font-size:11px;color:var(--text3);letter-spacing:.8px;animation:fadeUp .8s ease .4s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.terminal-section{padding:40px 20px 100px;display:flex;justify-content:center}
+.terminal{max-width:640px;width:100%;background:var(--dark);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:fadeUp .8s ease .5s both}
+.terminal-bar{height:36px;background:var(--dark2);display:flex;align-items:center;padding:0 14px;gap:7px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-dot.r{background:#ff5f57}.terminal-dot.y{background:#febc2e}.terminal-dot.g{background:#28c840}
+.terminal-title{flex:1;text-align:center;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.terminal-body{padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--green);min-height:180px}
+.terminal-body .prompt{color:var(--text3)}
+.terminal-body .cmd{color:var(--text)}
+.terminal-body .output{color:var(--green);opacity:.8}
+.terminal-body .comment{color:var(--text3);font-style:italic}
+
+.story{padding:100px 20px;max-width:800px;margin:0 auto}
+.story-label{font-size:10px;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:3px;font-family:'JetBrains Mono',monospace;margin-bottom:18px}
+.story h2{font-size:clamp(28px,4.5vw,48px);font-weight:600;letter-spacing:-1.5px;line-height:1.1;margin-bottom:24px}
+.story p{font-size:17px;color:var(--text2);line-height:1.85;font-weight:300;letter-spacing:.1px;max-width:620px}
+.story p+p{margin-top:16px}
+
+.features{padding:80px 20px 120px;max-width:1100px;margin:0 auto}
+.features-header{text-align:center;margin-bottom:56px}
+.features-header h2{font-size:clamp(28px,4.5vw,48px);font-weight:600;letter-spacing:-1.5px}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.feat-card{background:var(--dark2);border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:28px;transition:all .3s;position:relative;overflow:hidden}
+.feat-card:hover{border-color:rgba(0,255,65,0.15);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--greenDim),transparent);opacity:0;transition:opacity .3s}
+.feat-card:hover::before{opacity:1}
+.feat-icon{font-size:26px;margin-bottom:14px}
+.feat-card h3{font-size:16px;font-weight:600;margin-bottom:8px;letter-spacing:-.2px}
+.feat-card p{font-size:13px;color:var(--text2);line-height:1.75;font-weight:300;letter-spacing:.1px}
+
+.compare{padding:80px 20px 120px;max-width:800px;margin:0 auto}
+.compare h2{font-size:clamp(28px,4.5vw,48px);font-weight:600;letter-spacing:-1.5px;text-align:center;margin-bottom:52px}
+.compare-table{width:100%;border-collapse:collapse}
+.compare-table th,.compare-table td{padding:14px 12px;text-align:left;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.compare-table th{color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.compare-table th:not(:first-child){text-align:center}
+.compare-table td:not(:first-child){text-align:center;color:var(--text2)}
+.compare-table td:first-child{color:var(--text);font-weight:400}
+.compare-table .yes{color:var(--green)}.compare-table .no{color:var(--text3)}.compare-table .partial{color:var(--text3)}
+
+.pricing{padding:80px 20px 120px;text-align:center}
+.pricing h2{font-size:clamp(28px,4.5vw,48px);font-weight:600;letter-spacing:-1.5px;margin-bottom:14px}
+.pricing-sub{font-size:16px;color:var(--text2);font-weight:300;letter-spacing:.2px;margin-bottom:52px}
+.price-card{max-width:400px;margin:0 auto;background:var(--dark2);border:1px solid rgba(0,255,65,0.1);border-radius:20px;padding:36px;position:relative;overflow:hidden}
+.price-card::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.price-amount{font-size:56px;font-weight:700;letter-spacing:-2.5px;margin-bottom:4px}
+.price-amount .yen{font-size:24px;font-weight:400;color:var(--text2)}
+.price-amount .period{font-size:16px;font-weight:300;color:var(--text3)}
+.price-trial{font-size:13px;color:var(--green);margin-bottom:24px;font-family:'JetBrains Mono',monospace}
+.price-features{list-style:none;text-align:left;margin-bottom:32px}
+.price-features li{padding:8px 0;font-size:14px;color:var(--text2);font-weight:300;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.price-features li::before{content:'→';color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px}
+.price-cta{display:block;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:980px;font-size:15px;font-weight:500;letter-spacing:.3px;cursor:pointer;transition:all .2s;font-family:inherit;text-decoration:none;text-align:center}
+.price-cta:hover{background:var(--accent2);transform:translateY(-2px)}
+
+.faq{padding:80px 20px 120px;max-width:640px;margin:0 auto}
+.faq h2{font-size:clamp(28px,4.5vw,48px);font-weight:600;letter-spacing:-1.5px;text-align:center;margin-bottom:52px}
+.faq-item{border-bottom:1px solid rgba(255,255,255,0.04);padding:18px 0}
+.faq-q{font-size:15px;font-weight:500;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:color .2s;-webkit-tap-highlight-color:transparent}
+.faq-q:hover{color:var(--green)}
+.faq-q .arrow{font-size:18px;color:var(--text3);transition:transform .3s;flex-shrink:0}
+.faq-item.open .arrow{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s;font-size:14px;color:var(--text2);line-height:1.7;font-weight:300}
+.faq-item.open .faq-a{max-height:400px;padding-top:12px}
+
+footer{padding:40px 20px;text-align:center;border-top:1px solid rgba(255,255,255,0.03)}
+footer p{font-size:12px;color:var(--text3)}
+
+@media(max-width:768px){
+nav{padding:12px 16px}
+.nav-links a:not(.nav-cta){display:none}
+.hero{padding:90px 16px 60px}
+.hero h1{letter-spacing:-1px}
+.story{padding:72px 16px}
+.features{padding:60px 16px 80px}
+.feat-grid{grid-template-columns:1fr}
+.compare{padding:60px 16px 80px}
+.compare-table th,.compare-table td{padding:10px 6px;font-size:12px}
+.pricing{padding:60px 16px 80px}
+.faq{padding:60px 16px 80px}
+.terminal-body{font-size:10px;padding:12px}
+.btn-primary{width:100%;text-align:center;padding:16px}
+}
+</style>
+</head>
+<body>
+<canvas id="matrix-bg"></canvas>
+
+<nav>
+<div class="nav-logo">🦞 EasyClaw</div>
+<div class="nav-links">
+<a href="#features">機能</a>
+<a href="#compare">比較</a>
+<a href="#pricing">料金</a>
+<a href="#faq">FAQ</a>
+<a href="/chat.html" style="color:var(--text2);font-size:13px;text-decoration:none">ログイン</a><a href="/app.html" class="nav-cta">無料で始める</a>
+</div>
+</nav>
+
+<section class="hero">
+<div class="hero-badge"><span class="pulse"></span>OpenClaw powered · 24/7</div>
+<h1><span class="highlight">Al</span>ways On</h1>
+<p class="hero-sub">すべてのAIを ひとつの場所で<br>セットアップ不要 3分で起動</p>
+<div class="hero-actions"><a href="/app.html" class="btn-primary">3日間無料で試す</a></div>
+<p class="hero-note">クレジットカード不要 · 3日間トライアル · ¥980/週</p>
+</section>
+
+<div class="terminal-section">
+<div class="terminal">
+<div class="terminal-bar"><span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span><span class="terminal-title">easyclaw</span></div>
+<div class="terminal-body" id="terminalBody"></div>
+</div>
+</div>
+
+<section class="story" id="story">
+<div class="story-label">// なぜEasyClawなのか</div>
+<h2>AIはもっと<br>自由であるべきだ</h2>
+<p>ChatGPTに月額$20 Claudeに月額$20 Geminiにも月額$20<br>でもそれぞれ得意分野が違う コーディングはClaude リサーチはGemini 文章はGPT</p>
+<p>なぜ一つのモデルに縛られなければならないのか EasyClawならすべてのモデルを一つの場所から一つの記憶で使える</p>
+</section>
+
+<section class="story">
+<div class="story-label">// 24時間 止まらない知性</div>
+<h2>あなたが眠っている間も<br>AIは働き続ける</h2>
+<p>毎朝 昨日のニュースがサマリーされている 受信メールは自動で分類されている 株価の変動はあなたが起きる前にレポートされている</p>
+<p>ブラウザを閉じたら終わるAIとは違う EasyClawは24時間365日 サーバー上で稼働し続ける あなたの分身として</p>
+</section>
+
+<section class="story">
+<div class="story-label">// 記憶する知性</div>
+<h2>使えば使うほど<br>賢くなる</h2>
+<p>従来のAIは会話が終われば全てを忘れる EasyClawのAIは永続的なメモリを持ち あなたの好み プロジェクト 文脈を覚え続ける</p>
+<p>3ヶ月後のAIは初日とは別物になっている それは成長するパートナーだ</p>
+</section>
+
+<section class="features" id="features">
+<div class="features-header"><h2>すべてがここにある</h2></div>
+<div class="feat-grid">
+<div class="feat-card"><div class="feat-icon">🔄</div><h3>マルチモデル切替</h3><p>GPT-4o Claude Sonnet Gemini Flash タスクに合わせて最適なモデルを瞬時に切り替え</p></div>
+<div class="feat-card"><div class="feat-icon">⏰</div><h3>24時間365日稼働</h3><p>VPSサーバー上で常時稼働 ブラウザを閉じても PCをシャットダウンしても AIは止まらない</p></div>
+<div class="feat-card"><div class="feat-icon">🧠</div><h3>永続メモリ</h3><p>会話履歴 ファイル ワークスペースが永続的に保存 使うほどに文脈を理解するAIへ</p></div>
+<div class="feat-card"><div class="feat-icon">💬</div><h3>マルチチャネル</h3><p>Telegram Web UI 好きなプラットフォームからアクセス どこからでもあなたのAIに</p></div>
+<div class="feat-card"><div class="feat-icon">🌐</div><h3>Web自動巡回</h3><p>ニュース収集 サイト監視 情報要約 AIが自動でWebを巡回し必要な情報を届ける</p></div>
+<div class="feat-card"><div class="feat-icon">🔓</div><h3>完全プライベート</h3><p>あなた専用のDockerコンテナで完全隔離 データは他のユーザーから完全に分離</p></div>
+</div>
+</section>
+
+<section class="compare" id="compare">
+<h2>比較する</h2>
+<table class="compare-table">
+<thead><tr><th></th><th>ChatGPT / Claude</th><th>EasyClaw</th></tr></thead>
+<tbody>
+<tr><td>使えるモデル</td><td class="no">契約サービスのみ</td><td class="yes">全モデル切替自由</td></tr>
+<tr><td>24時間稼働</td><td class="no">✗</td><td class="yes">✓</td></tr>
+<tr><td>Web自動巡回</td><td class="partial">限定的</td><td class="yes">✓</td></tr>
+<tr><td>ファイル永続保存</td><td class="partial">セッション内のみ</td><td class="yes">✓ サーバー上に永続</td></tr>
+<tr><td>記憶の永続化</td><td class="partial">限定的</td><td class="yes">✓ 完全永続</td></tr>
+<tr><td>マルチチャネル</td><td class="no">ブラウザのみ</td><td class="yes">/ Telegram / Web</td></tr>
+<tr><td>モデルロックイン</td><td class="no">特定AIに依存</td><td class="yes">いつでも変更可能</td></tr>
+<tr><td>月額コスト</td><td class="no">$20〜/月 (1社分)</td><td class="yes">¥980/週 + API従量</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="pricing" id="pricing">
+<h2>シンプルな料金</h2>
+<p class="pricing-sub">隠れたコストはない</p>
+<div class="price-card">
+<div class="price-amount"><span class="yen">¥</span>980<span class="period"> /週</span></div>
+<div class="price-trial">→ 最初の3日間は無料</div>
+<ul class="price-features">
+<li>24時間稼働AIアシスタント</li>
+<li>GPT / Claude / Gemini 全モデル対応</li>
+<li>+ Telegram + Web チャット</li>
+<li>永続メモリ & ファイルストレージ</li>
+<li>Web自動巡回 & 情報収集</li>
+<li>専用Dockerコンテナ (完全隔離)</li>
+<li>API利用料は別途 (使った分だけ)</li>
+</ul>
+<a href="/app.html" class="price-cta">無料トライアルを始める</a>
+</div>
+</section>
+
+<section class="faq" id="faq">
+<h2>よくある質問</h2>
+<div class="faq-item" onclick="this.classList.toggle('open')">
+<div class="faq-q">EasyClawとは何ですか<span class="arrow">+</span></div>
+<div class="faq-a">EasyClawはAI自動化フレームワーク「OpenClaw」のホスティングサービスです サーバー構築やDocker設定の知識がなくても3分でAIアシスタントを起動できます ChatGPT Claude Geminiなど複数のAIモデルを一つの環境で使えます</div>
+</div>
+<div class="faq-item" onclick="this.classList.toggle('open')">
+<div class="faq-q">APIキーは自分で用意する必要がありますか<span class="arrow">+</span></div>
+<div class="faq-a">はい OpenAI Anthropic GoogleなどのAPIキーをご自身でご用意ください EasyClawはホスティング環境を提供し APIの利用料はお客様のアカウントに直接課金されます これにより透明性のある従量課金が可能です</div>
+</div>
+<div class="faq-item" onclick="this.classList.toggle('open')">
+<div class="faq-q">ローカルPC版のOpenClawとの違いは<span class="arrow">+</span></div>
+<div class="faq-a">EasyClawはVPS上のDocker環境で動作します シェルコマンド実行 ブラウザ直接操作 Apple連携 (macOS専用機能) ローカルLLMには制限があります 一方 AI会話 Web取得 ファイル操作 メモリ永続化 マルチモデル切替 チャット連携は全て動作します 24時間稼働とサーバー管理不要が最大の利点です</div>
+</div>
+<div class="faq-item" onclick="this.classList.toggle('open')">
+<div class="faq-q">解約はいつでもできますか<span class="arrow">+</span></div>
+<div class="faq-a">はい いつでもワンクリックで解約可能です 解約後は次の請求サイクル終了まで利用でき その後サービスが停止します</div>
+</div>
+<div class="faq-item" onclick="this.classList.toggle('open')">
+<div class="faq-q">データは安全ですか<span class="arrow">+</span></div>
+<div class="faq-a">各ユーザーに専用のDockerコンテナが割り当てられ 完全に隔離された環境で動作します 他のユーザーのデータにアクセスすることは技術的に不可能です</div>
+</div>
+</section>
+
+<footer><p>© 2026 EasyClaw  Powered by OpenClaw</p></footer>
+
+<script>
+(function(){
+var c=document.getElementById('matrix-bg'),ctx=c.getContext('2d');
+function resize(){c.width=window.innerWidth;c.height=window.innerHeight}
+resize();
+var chars='01'.split('');
+var fontSize=14;
+var cols=Math.floor(c.width/fontSize);
+var drops=[];for(var i=0;i<cols;i++)drops[i]=Math.random()*-100;
+function draw(){
+ctx.fillStyle='rgba(5,5,5,0.06)';ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle='#00ff41';ctx.font=fontSize+'px JetBrains Mono,monospace';
+for(var i=0;i<drops.length;i++){
+var ch=chars[Math.floor(Math.random()*chars.length)];
+ctx.globalAlpha=Math.random()*0.5+0.1;
+ctx.fillText(ch,i*fontSize,drops[i]*fontSize);
+if(drops[i]*fontSize>c.height&&Math.random()>0.975)drops[i]=0;
+drops[i]+=0.5+Math.random()*0.5;
+}ctx.globalAlpha=1;
+}
+setInterval(draw,50);
+window.addEventListener('resize',function(){resize();cols=Math.floor(c.width/fontSize);while(drops.length<cols)drops.push(0)});
+})();
+
+(function(){
+var lines=[
+{type:'comment',text:'# 3分でAIが起動する'},
+{type:'prompt',text:'$ easyclaw deploy --model claude-sonnet-4.5'},
+{type:'output',text:'🦞 Deploying your AI assistant...'},
+{type:'output',text:'   ✓ Docker container created'},
+{type:'output',text:'   ✓ OpenClaw gateway online'},
+{type:'output',text:'   ✓ bot connected'},
+{type:'output',text:'   ✓ Memory initialized'},
+{type:'output',text:''},
+{type:'output',text:'✨ Your AI is live at easyclaw.jp/chat'},
+{type:'output',text:'   Status: online | 24/7 | ready'},
+];
+var el=document.getElementById('terminalBody'),i=0;
+function add(){if(i>=lines.length)return;var l=lines[i];var d=document.createElement('div');
+if(l.type==='comment'){d.className='comment';d.textContent=l.text}
+else if(l.type==='prompt'){d.innerHTML='<span class="prompt">~/easyclaw</span> <span class="cmd">'+l.text.slice(2)+'</span>'}
+else{d.className='output';d.textContent=l.text}
+el.appendChild(d);i++;setTimeout(add,l.type==='prompt'?800:l.text===''?200:300)}
+var obs=new IntersectionObserver(function(e){if(e[0].isIntersecting){add();obs.disconnect()}},{threshold:0.3});
+obs.observe(document.querySelector('.terminal'));
+})();
+
+(function(){
+var els=document.querySelectorAll('.story,.feat-card,.compare,.faq,.pricing');
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='none'}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(30px)';el.style.transition='opacity .6s ease,transform .6s ease';obs.observe(el)});
+})();
+</script>
+</body>
+</html>

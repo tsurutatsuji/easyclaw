@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>法的情報 - EasyClaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050508;--surface:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.06);--text:#e8e8e8;--text2:rgba(255,255,255,0.5);--accent:#FF5722;--accent2:#FF7043}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-weight:300;line-height:1.8;min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.08;pointer-events:none;z-index:0}
+.orb1{width:400px;height:400px;background:#FF5722;top:-100px;right:-100px}
+.orb2{width:300px;height:300px;background:#FF7043;bottom:-50px;left:-50px}
+.back-btn{position:fixed;top:24px;left:24px;color:var(--text2);text-decoration:none;font-family:'Space Mono',monospace;font-size:13px;z-index:100;transition:color .2s}
+.back-btn:hover{color:var(--text)}
+.container{max-width:800px;margin:0 auto;padding:80px 24px 60px;position:relative;z-index:1}
+h1{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;text-align:center;margin-bottom:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tab-nav{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tab-btn{flex:1;padding:12px 8px;background:transparent;border:none;color:var(--text2);font-family:'Space Mono',monospace;font-size:12px;cursor:pointer;transition:all .2s;text-align:center}
+.tab-btn:not(:last-child){border-right:1px solid var(--border)}
+.tab-btn.active{background:rgba(255,87,34,0.1);color:var(--accent)}
+.tab-btn:hover{color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.legal-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;margin-bottom:24px}
+.legal-section h2{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:20px;letter-spacing:1px;text-transform:uppercase}
+.legal-section h3{font-size:15px;font-weight:500;color:var(--text);margin:20px 0 8px;padding-left:12px;border-left:2px solid var(--accent)}
+.legal-section p,.legal-section li{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.9;margin-bottom:8px}
+.legal-section ul{padding-left:20px}
+.legal-section li{margin-bottom:4px}
+.updated{text-align:center;color:var(--text2);font-size:12px;font-family:'Space Mono',monospace;margin-top:40px}
+footer{text-align:center;padding:40px 24px;color:var(--text2);font-size:12px;font-family:'Space Mono',monospace;position:relative;z-index:1}
+footer a{color:var(--text2);text-decoration:none;margin:0 12px;transition:color .2s}
+footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<a href="/" class="back-btn">← トップに戻る</a>
+<div class="container">
+<h1>LEGAL</h1>
+<div class="tab-nav">
+<button class="tab-btn active" onclick="switchTab('terms')">利用規約</button>
+<button class="tab-btn" onclick="switchTab('privacy')">プライバシーポリシー</button>
+<button class="tab-btn" onclick="switchTab('tokusho')">特定商取引法</button>
+</div>
+<div id="terms" class="tab-content active">
+<div class="legal-section">
+<h2>利用規約</h2>
+<h3>第1条 適用</h3>
+<p>本規約はEasyClaw（以下「本サービス」）の利用に関する条件を定めるものです 本サービスを利用した時点で本規約に同意したものとみなします</p>
+<h3>第2条 サービス内容</h3>
+<p>本サービスはOpenClaw（オープンソースのAIアシスタント）のホスティングサービスです ユーザーはDiscord上でAIボットを簡単にデプロイし運用することができます</p>
+<h3>第3条 アカウント</h3>
+<ul><li>ユーザーは正確な情報を提供する必要があります</li><li>アカウント情報の管理はユーザーの責任とします</li><li>1人につき1アカウントとします</li><li>不正利用が発覚した場合アカウントを停止することがあります</li></ul>
+<h3>第4条 料金と支払い</h3>
+<ul><li>料金プランは本サービスのウェブサイトに表示されるとおりとします</li><li>24時間の無料トライアル期間があります</li><li>トライアル終了後は自動的に課金が開始されます</li><li>支払いはStripeを通じたクレジットカード決済で行われます</li><li>解約はいつでも可能です 解約後は現在の請求期間の終了まで利用できます</li></ul>
+<h3>第5条 禁止事項</h3>
+<ul><li>法令に違反する行為</li><li>他のユーザーへの迷惑行為</li><li>サーバーに過度な負荷をかける行為</li><li>本サービスの逆アセンブル リバースエンジニアリング</li><li>第三者へのアカウント譲渡 貸与</li><li>公序良俗に反するコンテンツの生成</li></ul>
+<h3>第6条 免責事項</h3>
+<ul><li>本サービスは現状有姿で提供されます</li><li>サービスの中断 停止 変更について事前の通知なく行うことがあります</li><li>本サービスの利用により生じた損害について運営者は一切の責任を負いません</li><li>OpenClawの仕様変更に伴うサービスへの影響について保証しません</li></ul>
+<h3>第7条 知的財産権</h3>
+<p>本サービスに関する知的財産権は運営者に帰属します ユーザーが生成したコンテンツの権利はユーザーに帰属します</p>
+<h3>第8条 規約の変更</h3>
+<p>運営者は必要に応じて本規約を変更できるものとします 変更後の規約はウェブサイト上での掲載をもって効力を生じます</p>
+<h3>第9条 準拠法 管轄裁判所</h3>
+<p>本規約は日本法に準拠します 紛争が生じた場合は東京地方裁判所を第一審の専属的合意管轄裁判所とします</p>
+</div></div>
+<div id="privacy" class="tab-content">
+<div class="legal-section">
+<h2>プライバシーポリシー</h2>
+<h3>1. 収集する情報</h3>
+<ul><li>メールアドレス（アカウント作成 ログイン用）</li><li>パスワード（bcryptによるハッシュ化保存）</li><li>Discord Bot Token（暗号化して保存）</li><li>AIプロバイダーのAPIキー（暗号化して保存）</li><li>決済情報（Stripeが管理 当方では保持しません）</li></ul>
+<h3>2. 情報の利用目的</h3>
+<ul><li>サービスの提供 運営</li><li>アカウント管理 認証</li><li>料金の請求処理</li><li>サービスの改善</li><li>重要なお知らせの送信</li></ul>
+<h3>3. 第三者提供</h3>
+<p>以下の場合を除きユーザーの個人情報を第三者に提供することはありません</p>
+<ul><li>ユーザーの同意がある場合</li><li>法令に基づく場合</li><li>決済処理に必要な範囲でStripeに提供する場合</li></ul>
+<h3>4. セキュリティ</h3>
+<p>個人情報の漏洩 紛失 改ざんを防止するため適切なセキュリティ対策を実施しています ただし完全なセキュリティを保証するものではありません</p>
+<h3>5. データの保持期間</h3>
+<p>アカウント削除後30日以内にすべてのデータを削除します バックアップからの完全削除には最大90日かかる場合があります</p>
+<h3>6. お問い合わせ</h3>
+<p>個人情報の開示 訂正 削除のご依頼は以下までご連絡ください</p>
+<p>メール: helongzhi57@gmail.com</p>
+</div></div>
+<div id="tokusho" class="tab-content">
+<div class="legal-section">
+<h2>特定商取引法に基づく表記</h2>
+<h3>事業者名</h3><p>鶴竜治</p>
+<h3>運営責任者</h3><p>鶴竜治</p>
+<h3>所在地</h3><p>請求があった場合に遅滞なく開示します</p>
+<h3>連絡先</h3><p>メール: helongzhi57@gmail.com</p><p>請求があった場合に遅滞なく電話番号を開示します</p>
+<h3>販売価格</h3><ul><li>スタータープラン: 月額980円（税込）</li><li>スタンダードプラン: 月額2,980円（税込）</li><li>プロプラン: 月額4,980円（税込）</li></ul>
+<h3>支払方法</h3><p>クレジットカード決済（Stripe経由）</p>
+<h3>支払時期</h3><p>24時間の無料トライアル終了後に初回課金 以降毎月自動課金</p>
+<h3>サービス提供時期</h3><p>申込完了後 即時利用可能</p>
+<h3>返品 キャンセル</h3><p>デジタルサービスの性質上 返金には応じかねます 解約はいつでも可能で 現在の請求期間の終了まで利用できます 無料トライアル期間中の解約であれば料金は発生しません</p>
+<h3>動作環境</h3><p>Discordアカウント 対応AIプロバイダーのAPIキー インターネット接続環境</p>
+</div></div>
+<p class="updated">Last updated: 2026-02-20</p>
+</div>
+<footer><a href="/">トップ</a><span style="color:rgba(255,255,255,0.15)">|</span><a href="/app.html">アプリ</a></footer>
+<script>
+function switchTab(id){document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active')});document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active')});document.getElementById(id).classList.add('active');var tabs={'terms':0,'privacy':1,'tokusho':2};document.querySelectorAll('.tab-btn')[tabs[id]].classList.add('active')}
+if(window.location.hash){var h=window.location.hash.substring(1);if(['terms','privacy','tokusho'].indexOf(h)!==-1)switchTab(h)}
+</script>
+</body>
+</html>
