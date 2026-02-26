@@ -60,6 +60,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 .resend-link a{color:var(--text2);cursor:pointer;text-decoration:none;transition:color .2s}
 .resend-link a:hover{color:var(--green)}
 
+.help-note{background:rgba(0,255,65,0.03);border:1px solid rgba(0,255,65,0.1);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--text2);line-height:1.7;display:flex;align-items:flex-start;gap:8px}
+.help-note .icon{flex-shrink:0;font-size:14px}
+.help-note a{color:var(--green);text-decoration:none;font-weight:500}
+.help-note a:hover{text-decoration:underline}
+.help-note code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.08);padding:0 4px;border-radius:3px;color:var(--green)}
+
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -103,6 +109,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
       <h1>Get Started</h1>
       <p>無料でアカウントを作成</p>
     </div>
+    <div class="help-note">
+      <span class="icon">🆓</span>
+      <div>登録は完全無料です。メールアドレスとパスワードだけで始められます。クレジットカード不要。</div>
+    </div>
     <div id="registerAlert" class="alert"></div>
     <div class="form-group">
       <label class="form-label">Email</label>
@@ -121,6 +131,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
     <div class="auth-header">
       <h1>認証コード</h1>
       <p id="otpEmail">送信されたコードを入力</p>
+    </div>
+    <div class="help-note" id="otpHelpNote" style="display:none">
+      <span class="icon">💡</span>
+      <div>ローカル環境ではメール送信が無効のため、認証コードはサーバーのコンソール（ターミナル）に表示されます。<br><code>node server.js</code> を実行したウィンドウを確認してください。</div>
     </div>
     <div id="otpAlert" class="alert"></div>
     <div class="otp-input" id="otpInputs">
@@ -166,6 +180,10 @@ function showView(view) {
   document.getElementById("loginView").style.display = view === "login" ? "block" : "none";
   document.getElementById("registerView").style.display = view === "register" ? "block" : "none";
   document.getElementById("otpView").style.display = view === "otp" ? "block" : "none";
+  // Show OTP console help note (always show in local mode since Gmail is likely not configured)
+  if (view === "otp") {
+    document.getElementById("otpHelpNote").style.display = "flex";
+  }
 }
 
 function showAlert(id, msg, type) {

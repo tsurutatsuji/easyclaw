@@ -26,7 +26,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 
 .setup-container{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:100px 20px 60px}
 
-.setup-header{text-align:center;margin-bottom:48px;animation:fadeUp .6s ease}
+.setup-header{text-align:center;margin-bottom:40px;animation:fadeUp .6s ease}
 .setup-header h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,40px);font-weight:600;letter-spacing:-1px;margin-bottom:12px}
 .setup-header p{font-size:14px;color:var(--text2);font-weight:300;letter-spacing:.3px}
 
@@ -34,19 +34,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 .step{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,0.1);color:var(--text3);transition:all .3s}
 .step.active{background:var(--green);color:var(--black);border-color:var(--green);box-shadow:0 0 20px rgba(0,255,65,0.2)}
 .step.done{background:rgba(0,255,65,0.1);color:var(--green);border-color:rgba(0,255,65,0.3)}
-.step-line{width:40px;height:1px;background:rgba(255,255,255,0.08)}
+.step-line{width:40px;height:1px;background:rgba(255,255,255,0.08);transition:background .3s}
+.step-line.done{background:rgba(0,255,65,0.3)}
 
-.provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;animation:fadeUp .6s ease .2s both}
-.provider-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px 20px;cursor:pointer;transition:all .3s;position:relative}
-.provider-card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-2px)}
-.provider-card.selected{border-color:rgba(0,255,65,0.4);background:rgba(0,255,65,0.03);box-shadow:0 0 30px rgba(0,255,65,0.05)}
-.provider-card.recommended::after{content:'おすすめ';position:absolute;top:12px;right:12px;font-size:9px;font-weight:600;color:var(--green);background:rgba(0,255,65,0.1);padding:3px 10px;border-radius:980px;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
-.provider-icon{font-size:28px;margin-bottom:12px}
-.provider-name{font-size:15px;font-weight:600;margin-bottom:4px}
-.provider-desc{font-size:11px;color:var(--text3);line-height:1.5}
-.provider-free{font-size:10px;color:var(--green);font-weight:500;margin-top:8px;font-family:'JetBrains Mono',monospace}
+.wizard-step{display:none;animation:fadeUp .4s ease}
+.wizard-step.active{display:block}
 
-.config-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;margin-bottom:24px;animation:fadeUp .6s ease .3s both}
+.config-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;margin-bottom:24px}
 .config-title{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:20px}
 
 .form-group{margin-bottom:20px}
@@ -59,6 +53,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 .form-hint{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
 .form-hint a{color:var(--green);text-decoration:none}
 
+/* Check items */
+.check-list{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.check-item{display:flex;align-items:center;gap:16px;padding:18px 20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;transition:all .3s}
+.check-item.ok{border-color:rgba(0,255,65,0.2);background:rgba(0,255,65,0.02)}
+.check-item.fail{border-color:rgba(248,113,113,0.2);background:rgba(248,113,113,0.02)}
+.check-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+.check-item.ok .check-icon{background:rgba(0,255,65,0.08);border-color:rgba(0,255,65,0.2);color:var(--green)}
+.check-item.fail .check-icon{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.2);color:#F87171}
+.check-info{flex:1}
+.check-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.check-detail{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.check-item.ok .check-detail{color:var(--green)}
+.check-item.fail .check-detail{color:#F87171}
+.check-help{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.6}
+.check-help code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.08);padding:1px 6px;border-radius:4px;color:var(--green)}
+.check-help a{color:var(--green);text-decoration:none}
+.check-help a:hover{text-decoration:underline}
+
 .test-row{display:flex;align-items:center;gap:12px;margin-bottom:24px}
 .test-btn{padding:10px 24px;border:1px solid rgba(255,255,255,0.1);border-radius:980px;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
 .test-btn:hover{border-color:var(--green);color:var(--green)}
@@ -67,17 +79,44 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 .test-status.fail{color:#F87171}
 .test-status.loading{color:var(--text3)}
 
-.btn-primary{display:block;width:100%;padding:18px;border:none;border-radius:980px;font-size:16px;font-weight:500;cursor:pointer;background:var(--accent);color:#fff;font-family:inherit;letter-spacing:.3px;transition:all .25s;animation:fadeUp .6s ease .4s both}
+/* Status indicator */
+.status-box{text-align:center;padding:32px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;margin-bottom:24px}
+.status-icon{font-size:48px;margin-bottom:16px}
+.status-text{font-size:16px;font-weight:500;margin-bottom:8px}
+.status-detail{font-size:13px;color:var(--text2);line-height:1.6}
+
+.btn-row{display:flex;gap:12px}
+.btn-primary{flex:1;display:block;padding:18px;border:none;border-radius:980px;font-size:16px;font-weight:500;cursor:pointer;background:var(--accent);color:#fff;font-family:inherit;letter-spacing:.3px;transition:all .25s}
 .btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,86,42,0.3)}
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{flex:1;display:block;padding:18px;border:1px solid rgba(255,255,255,0.1);border-radius:980px;font-size:16px;font-weight:500;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;letter-spacing:.3px;transition:all .25s}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
 
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
+/* Help popup */
+.help-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(0,255,65,0.08);border:1px solid rgba(0,255,65,0.15);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .2s;vertical-align:middle;margin-left:6px;flex-shrink:0}
+.help-btn:hover{background:rgba(0,255,65,0.15);border-color:rgba(0,255,65,0.3);transform:scale(1.1)}
+.help-popup{display:none;position:fixed;z-index:200;width:380px;max-width:90vw;background:var(--dark);border:1px solid rgba(0,255,65,0.15);border-radius:16px;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:fadeUp .2s ease;top:50%;left:50%;transform:translate(-50%,-50%)}
+.help-popup.show{display:block}
+.help-popup-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.help-popup-body{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:16px}
+.help-popup-body code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.08);padding:1px 6px;border-radius:4px;color:var(--green)}
+.help-popup-body ol,.help-popup-body ul{padding-left:18px;margin:8px 0}
+.help-popup-body li{margin-bottom:4px}
+.help-popup-link{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(0,255,65,0.06);border:1px solid rgba(0,255,65,0.15);border-radius:980px;color:var(--green);font-size:12px;font-weight:500;text-decoration:none;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.help-popup-link:hover{background:rgba(0,255,65,0.12);border-color:rgba(0,255,65,0.3);transform:translateY(-1px)}
+.help-popup-link+.help-popup-link{margin-left:8px}
+.help-popup-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;transition:color .2s}
+.help-popup-close:hover{color:var(--text)}
+.help-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4)}
+.help-overlay.show{display:block}
+
 @media(max-width:480px){
-  .provider-grid{grid-template-columns:1fr}
   .config-section{padding:20px}
+  .btn-row{flex-direction:column}
 }
 </style>
 </head>
@@ -91,133 +130,242 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 <div class="setup-container">
   <div class="setup-header">
     <h1>Setup</h1>
-    <p>AIプロバイダーを選択してチャットを始めましょう</p>
+    <p>OpenClaw + Ollama の環境を構築しましょう</p>
   </div>
 
   <div class="step-indicator">
-    <div class="step done">1</div>
-    <div class="step-line"></div>
-    <div class="step active">2</div>
-    <div class="step-line"></div>
-    <div class="step">3</div>
+    <div class="step active" id="stepDot1">1</div>
+    <div class="step-line" id="stepLine1"></div>
+    <div class="step" id="stepDot2">2</div>
+    <div class="step-line" id="stepLine2"></div>
+    <div class="step" id="stepDot3">3</div>
   </div>
 
-  <div class="provider-grid">
-    <div class="provider-card recommended selected" onclick="selectProvider('ollama')">
-      <div class="provider-icon">🦙</div>
-      <div class="provider-name">Ollama</div>
-      <div class="provider-desc">ローカルで動作するAI。プライバシー重視。</div>
-      <div class="provider-free">無料 / ローカル実行</div>
+  <!-- Step 1: Prerequisites Check -->
+  <div class="wizard-step active" id="wizardStep1">
+    <div class="config-section">
+      <div class="config-title">環境チェック</div>
+      <div class="check-list" id="checkList">
+        <div class="check-item" id="checkNode">
+          <div class="check-icon">⏳</div>
+          <div class="check-info">
+            <div class="check-name">Node.js (v22+)</div>
+            <div class="check-detail">確認中...</div>
+          </div>
+        </div>
+        <div class="check-item" id="checkOllama">
+          <div class="check-icon">⏳</div>
+          <div class="check-info">
+            <div class="check-name">Ollama</div>
+            <div class="check-detail">確認中...</div>
+          </div>
+        </div>
+        <div class="check-item" id="checkOpenclaw">
+          <div class="check-icon">⏳</div>
+          <div class="check-info">
+            <div class="check-name">OpenClaw CLI</div>
+            <div class="check-detail">確認中...</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-row">
+        <button class="test-btn" onclick="runPrereqCheck()">再チェック</button>
+        <span class="test-status" id="prereqStatus"></span>
+      </div>
     </div>
-    <div class="provider-card" onclick="selectProvider('google')">
-      <div class="provider-icon">✨</div>
-      <div class="provider-name">Google Gemini</div>
-      <div class="provider-desc">Googleの最新AIモデル。</div>
-      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
-    </div>
-    <div class="provider-card" onclick="selectProvider('anthropic')">
-      <div class="provider-icon">🧠</div>
-      <div class="provider-name">Anthropic Claude</div>
-      <div class="provider-desc">高精度な推論が得意。</div>
-      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
-    </div>
-    <div class="provider-card" onclick="selectProvider('openai')">
-      <div class="provider-icon">🤖</div>
-      <div class="provider-name">OpenAI GPT</div>
-      <div class="provider-desc">GPT-4oなど最新モデル。</div>
-      <div class="provider-free" style="color:var(--text3)">APIキー必要</div>
-    </div>
-  </div>
-
-  <!-- Ollama Config -->
-  <div class="config-section" id="ollamaConfig">
-    <div class="config-title">Ollama 設定</div>
-    <div class="form-group">
-      <label class="form-label">Ollama URL</label>
-      <input type="text" id="ollamaUrl" class="form-input" value="http://localhost:11434" placeholder="http://localhost:11434">
-    </div>
-    <div class="form-group">
-      <label class="form-label">モデル</label>
-      <select id="ollamaModel" class="form-select">
-        <option value="">読み込み中...</option>
-      </select>
-      <div class="form-hint">Ollamaにインストール済みのモデルが表示されます。<br>未インストールの場合: <a href="https://ollama.com" target="_blank">ollama.com</a> からダウンロード</div>
-    </div>
-    <div class="test-row">
-      <button class="test-btn" onclick="testConnection()">接続テスト</button>
-      <span class="test-status" id="testStatus"></span>
+    <div class="btn-row">
+      <button class="btn-primary" id="step1Next" onclick="goToStep(2)" disabled>次へ</button>
     </div>
   </div>
 
-  <!-- API Config -->
-  <div class="config-section" id="apiConfig" style="display:none">
-    <div class="config-title" id="apiConfigTitle">API 設定</div>
-    <div class="form-group">
-      <label class="form-label">APIキー</label>
-      <input type="password" id="apiKey" class="form-input" placeholder="APIキーを入力">
+  <!-- Step 2: Ollama Model Setup -->
+  <div class="wizard-step" id="wizardStep2">
+    <div class="config-section">
+      <div class="config-title">Ollama モデル設定 <span class="help-btn" onclick="showHelp('ollama-setup')" title="セットアップ方法">?</span></div>
+      <div class="form-group">
+        <label class="form-label">Ollama URL <span class="help-btn" onclick="showHelp('ollama-url')" title="URLとは？">?</span></label>
+        <input type="text" id="ollamaUrl" class="form-input" value="http://localhost:11434" placeholder="http://localhost:11434">
+        <div class="form-hint">通常はこのままでOKです。変更不要。</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">モデル <span class="help-btn" onclick="showHelp('ollama-model')" title="モデルとは？">?</span></label>
+        <select id="ollamaModel" class="form-select">
+          <option value="">読み込み中...</option>
+        </select>
+        <div class="form-hint">Ollamaにインストール済みのモデルが表示されます。<br>モデルがない場合: <code>ollama pull llama3.2</code> を実行してください。</div>
+      </div>
+      <div class="test-row">
+        <button class="test-btn" onclick="testOllamaConnection()">接続テスト</button>
+        <span class="test-status" id="ollamaTestStatus"></span>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">モデル</label>
-      <select id="apiModel" class="form-select">
-        <option value="">プロバイダーを選択してください</option>
-      </select>
-    </div>
-    <div class="test-row">
-      <button class="test-btn" onclick="testConnection()">接続テスト</button>
-      <span class="test-status" id="testStatusApi"></span>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goToStep(1)">戻る</button>
+      <button class="btn-primary" id="step2Next" onclick="goToStep(3)">次へ</button>
     </div>
   </div>
 
-  <button class="btn-primary" id="saveBtn" onclick="saveSettings()">チャットを始める</button>
+  <!-- Step 3: OpenClaw Configuration -->
+  <div class="wizard-step" id="wizardStep3">
+    <div class="config-section">
+      <div class="config-title">OpenClaw 自動設定</div>
+      <div class="status-box" id="configStatusBox">
+        <div class="status-icon" id="configIcon">🔧</div>
+        <div class="status-text" id="configText">OpenClawをOllamaに接続する設定を生成します</div>
+        <div class="status-detail" id="configDetail">選択したOllama URLとモデルを使って、OpenClawの設定ファイルを自動作成します。</div>
+      </div>
+      <div style="text-align:center">
+        <button class="test-btn" id="configureBtn" onclick="configureOpenClaw()">設定を生成する</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goToStep(2)">戻る</button>
+      <button class="btn-primary" id="startChatBtn" onclick="finishSetup()" disabled>チャットを始める</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help Popup -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelp()"></div>
+<div class="help-popup" id="helpPopup">
+  <button class="help-popup-close" onclick="closeHelp()">&times;</button>
+  <div id="helpContent"></div>
 </div>
 
 <script>
+const HELP_DATA = {
+  "ollama-setup": {
+    title: "📋 Ollamaセットアップ手順",
+    body: "<ol><li><a href='https://ollama.com/download' target='_blank' style='color:var(--green)'>ollama.com</a> からOllamaをダウンロード・インストール</li><li>インストール後、Ollamaが自動で起動します</li><li>コマンドプロンプトで以下を実行：<br><code>ollama pull llama3.2</code></li><li>このページに戻って「接続テスト」をクリック</li></ol>",
+    links: [{ text: "Ollamaダウンロード", url: "https://ollama.com/download" }, { text: "モデル一覧", url: "https://ollama.com/library" }]
+  },
+  "ollama-url": {
+    title: "🔗 Ollama URLとは？",
+    body: "OllamaがPC上で動作する際のアドレスです。<br><br><strong>通常は変更不要です。</strong><br>デフォルトの <code>http://localhost:11434</code> のままお使いください。",
+    links: []
+  },
+  "ollama-model": {
+    title: "🤖 モデルのインストール方法",
+    body: "AIモデルは「頭脳」です。<br><br><strong>手順：</strong><ol><li>コマンドプロンプトを開く</li><li>以下を実行：<br><code>ollama pull llama3.2</code></li><li>完了後、このページを再読み込み</li></ol><br><strong>おすすめ：</strong><ul><li><code>llama3.2</code> — 軽量・高速（2GB）</li><li><code>gemma2</code> — Google製（2B）</li></ul>",
+    links: [{ text: "モデル一覧", url: "https://ollama.com/library" }]
+  }
+};
+
+function showHelp(key) {
+  const data = HELP_DATA[key];
+  if (!data) return;
+  let html = '<div class="help-popup-title">' + data.title + '</div>';
+  html += '<div class="help-popup-body">' + data.body + '</div>';
+  if (data.links && data.links.length > 0) {
+    html += '<div>';
+    data.links.forEach(function(link) {
+      html += '<a class="help-popup-link" href="' + link.url + '" target="_blank">↗ ' + link.text + '</a> ';
+    });
+    html += '</div>';
+  }
+  document.getElementById("helpContent").innerHTML = html;
+  document.getElementById("helpPopup").classList.add("show");
+  document.getElementById("helpOverlay").classList.add("show");
+}
+
+function closeHelp() {
+  document.getElementById("helpPopup").classList.remove("show");
+  document.getElementById("helpOverlay").classList.remove("show");
+}
+
+// Auth
 const token = localStorage.getItem("token");
 const email = localStorage.getItem("email");
 if (!token) location.href = "/app.html";
 if (email) document.getElementById("navUser").textContent = email;
 
-let currentProvider = "ollama";
+let currentStep = 1;
+let prereqsOk = false;
 
-const API_MODELS = {
-  google: [
-    { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-    { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" }
-  ],
-  anthropic: [
-    { value: "anthropic/claude-sonnet-4-5-20250929", label: "Claude Sonnet 4.5" },
-    { value: "anthropic/claude-haiku-3-5-20241022", label: "Claude Haiku 3.5" }
-  ],
-  openai: [
-    { value: "openai/gpt-4o", label: "GPT-4o" },
-    { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" }
-  ]
-};
+// === Step Navigation ===
+function goToStep(n) {
+  currentStep = n;
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById("wizardStep" + i).classList.toggle("active", i === n);
+    const dot = document.getElementById("stepDot" + i);
+    dot.className = "step" + (i < n ? " done" : i === n ? " active" : "");
+    if (i < 3) {
+      document.getElementById("stepLine" + i).className = "step-line" + (i < n ? " done" : "");
+    }
+  }
+  if (n === 2) loadOllamaModels();
+}
 
-function selectProvider(provider) {
-  currentProvider = provider;
-  document.querySelectorAll(".provider-card").forEach(c => c.classList.remove("selected"));
-  event.currentTarget.classList.add("selected");
+// === Step 1: Prerequisites ===
+async function runPrereqCheck() {
+  const statusEl = document.getElementById("prereqStatus");
+  statusEl.className = "test-status loading";
+  statusEl.textContent = "チェック中...";
 
-  if (provider === "ollama") {
-    document.getElementById("ollamaConfig").style.display = "block";
-    document.getElementById("apiConfig").style.display = "none";
-    loadOllamaModels();
-  } else {
-    document.getElementById("ollamaConfig").style.display = "none";
-    document.getElementById("apiConfig").style.display = "block";
-    const names = { google: "Google Gemini", anthropic: "Anthropic Claude", openai: "OpenAI GPT" };
-    document.getElementById("apiConfigTitle").textContent = (names[provider] || provider) + " 設定";
-    const sel = document.getElementById("apiModel");
-    sel.innerHTML = "";
-    (API_MODELS[provider] || []).forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m.value; opt.textContent = m.label;
-      sel.appendChild(opt);
-    });
+  // Reset items
+  ["checkNode", "checkOllama", "checkOpenclaw"].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = "check-item";
+    el.querySelector(".check-icon").textContent = "⏳";
+    el.querySelector(".check-detail").textContent = "確認中...";
+    const help = el.querySelector(".check-help");
+    if (help) help.remove();
+  });
+
+  try {
+    const res = await fetch("/api/prerequisites");
+    const data = await res.json();
+
+    // Node.js
+    updateCheckItem("checkNode", data.node.ok, data.node.installed
+      ? data.node.version + (data.node.ok ? "" : " (v22以上が必要)")
+      : "未インストール",
+      data.node.ok ? null : '<a href="https://nodejs.org/" target="_blank">Node.js公式サイト</a> からv22以上をインストールしてください。');
+
+    // Ollama
+    updateCheckItem("checkOllama", data.ollama.ok, data.ollama.installed
+      ? data.ollama.version
+      : "未インストール",
+      data.ollama.ok ? null : '<a href="https://ollama.com/download" target="_blank">Ollama公式サイト</a> からダウンロード・インストールしてください。');
+
+    // OpenClaw
+    updateCheckItem("checkOpenclaw", data.openclaw.ok, data.openclaw.installed
+      ? data.openclaw.version
+      : "未インストール",
+      data.openclaw.ok ? null : 'ターミナルで以下を実行: <code>npm install -g openclaw@latest</code>');
+
+    prereqsOk = data.node.ok && data.ollama.ok && data.openclaw.ok;
+    document.getElementById("step1Next").disabled = !prereqsOk;
+
+    if (prereqsOk) {
+      statusEl.className = "test-status ok";
+      statusEl.textContent = "全てOK!";
+    } else {
+      statusEl.className = "test-status fail";
+      statusEl.textContent = "未対応の項目があります";
+    }
+  } catch(e) {
+    statusEl.className = "test-status fail";
+    statusEl.textContent = "チェックに失敗しました";
   }
 }
 
+function updateCheckItem(id, ok, detail, helpHtml) {
+  const el = document.getElementById(id);
+  el.className = "check-item " + (ok ? "ok" : "fail");
+  el.querySelector(".check-icon").textContent = ok ? "✓" : "✗";
+  el.querySelector(".check-detail").textContent = detail;
+  const existing = el.querySelector(".check-help");
+  if (existing) existing.remove();
+  if (helpHtml) {
+    const helpEl = document.createElement("div");
+    helpEl.className = "check-help";
+    helpEl.innerHTML = helpHtml;
+    el.querySelector(".check-info").appendChild(helpEl);
+  }
+}
+
+// === Step 2: Ollama Model ===
 async function loadOllamaModels() {
   const sel = document.getElementById("ollamaModel");
   sel.innerHTML = '<option value="">読み込み中...</option>';
@@ -228,7 +376,9 @@ async function loadOllamaModels() {
       sel.innerHTML = "";
       data.models.forEach(m => {
         const opt = document.createElement("option");
-        opt.value = m.name; opt.textContent = m.name + " (" + formatSize(m.size) + ")";
+        const gb = m.size ? (m.size / (1024*1024*1024)).toFixed(1) + "GB" : "";
+        opt.value = m.name;
+        opt.textContent = m.name + (gb ? " (" + gb + ")" : "");
         sel.appendChild(opt);
       });
     } else {
@@ -239,81 +389,99 @@ async function loadOllamaModels() {
   }
 }
 
-function formatSize(bytes) {
-  if (!bytes) return "";
-  const gb = bytes / (1024 * 1024 * 1024);
-  return gb >= 1 ? gb.toFixed(1) + "GB" : (bytes / (1024 * 1024)).toFixed(0) + "MB";
-}
-
-async function testConnection() {
-  const statusEl = currentProvider === "ollama" ? document.getElementById("testStatus") : document.getElementById("testStatusApi");
+async function testOllamaConnection() {
+  const statusEl = document.getElementById("ollamaTestStatus");
   statusEl.className = "test-status loading";
   statusEl.textContent = "接続中...";
-
-  if (currentProvider === "ollama") {
-    try {
-      const res = await fetch("/api/ollama/health", { headers: { Authorization: "Bearer " + token } });
-      const data = await res.json();
-      if (data.ok) {
-        statusEl.className = "test-status ok";
-        statusEl.textContent = "接続成功";
-        loadOllamaModels();
-      } else {
-        statusEl.className = "test-status fail";
-        statusEl.textContent = "接続失敗 - Ollamaが起動していません";
-      }
-    } catch(e) {
-      statusEl.className = "test-status fail";
-      statusEl.textContent = "接続エラー";
-    }
-  } else {
-    // API key validation - just check if entered
-    const apiKey = document.getElementById("apiKey").value.trim();
-    if (apiKey) {
+  try {
+    const res = await fetch("/api/ollama/health", { headers: { Authorization: "Bearer " + token } });
+    const data = await res.json();
+    if (data.ok) {
       statusEl.className = "test-status ok";
-      statusEl.textContent = "APIキー設定済み";
+      statusEl.textContent = "接続成功!";
+      loadOllamaModels();
     } else {
       statusEl.className = "test-status fail";
-      statusEl.textContent = "APIキーを入力してください";
+      statusEl.textContent = "接続失敗 — Ollamaが起動していません";
     }
+  } catch(e) {
+    statusEl.className = "test-status fail";
+    statusEl.textContent = "接続エラー";
   }
 }
 
-async function saveSettings() {
-  const btn = document.getElementById("saveBtn");
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>保存中...';
+// === Step 3: OpenClaw Configure ===
+async function configureOpenClaw() {
+  const btn = document.getElementById("configureBtn");
+  btn.disabled = true;
+  btn.textContent = "設定中...";
+  document.getElementById("configIcon").textContent = "⏳";
+  document.getElementById("configText").textContent = "設定ファイルを生成中...";
 
-  const body = { provider: currentProvider };
-  if (currentProvider === "ollama") {
-    body.ollamaUrl = document.getElementById("ollamaUrl").value.trim() || "http://localhost:11434";
-    body.model = document.getElementById("ollamaModel").value || "llama3.2";
-  } else {
-    body.apiKey = document.getElementById("apiKey").value.trim();
-    body.model = document.getElementById("apiModel").value;
-    if (!body.apiKey) {
-      btn.disabled = false; btn.textContent = "チャットを始める";
-      return alert("APIキーを入力してください");
+  try {
+    const res = await fetch("/api/openclaw/configure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+      body: JSON.stringify({
+        ollamaUrl: document.getElementById("ollamaUrl").value.trim() || "http://localhost:11434",
+        model: document.getElementById("ollamaModel").value || "llama3.2"
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById("configIcon").textContent = "✅";
+      document.getElementById("configText").textContent = "設定が完了しました";
+      document.getElementById("configDetail").textContent = "設定ファイル: " + data.configPath;
+      document.getElementById("startChatBtn").disabled = false;
+      btn.textContent = "設定完了";
+    } else {
+      throw new Error(data.error || "設定に失敗しました");
     }
+  } catch(e) {
+    document.getElementById("configIcon").textContent = "❌";
+    document.getElementById("configText").textContent = "設定に失敗しました";
+    document.getElementById("configDetail").textContent = e.message;
+    btn.disabled = false;
+    btn.textContent = "再試行";
   }
+}
+
+// === Finish Setup ===
+async function finishSetup() {
+  const btn = document.getElementById("startChatBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>保存中...';
 
   try {
     const res = await fetch("/api/settings", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        provider: "ollama",
+        ollamaUrl: document.getElementById("ollamaUrl").value.trim() || "http://localhost:11434",
+        model: document.getElementById("ollamaModel").value || "llama3.2"
+      })
     });
     const data = await res.json();
     if (data.success) {
+      // Restart gateway so new config takes effect
+      try { await fetch("/api/openclaw/stop", { method: "POST", headers: { Authorization: "Bearer " + token } }); } catch(e) {}
+      try { await fetch("/api/openclaw/start", { method: "POST", headers: { Authorization: "Bearer " + token } }); } catch(e) {}
       location.href = "/chat.html";
     } else {
       alert("保存に失敗しました");
+      btn.disabled = false;
+      btn.textContent = "チャットを始める";
     }
-  } catch(e) { alert("通信エラー"); }
-  btn.disabled = false; btn.textContent = "チャットを始める";
+  } catch(e) {
+    alert("通信エラー");
+    btn.disabled = false;
+    btn.textContent = "チャットを始める";
+  }
 }
 
 // Init
-loadOllamaModels();
+runPrereqCheck();
 
 // Matrix rain
 (function() {
