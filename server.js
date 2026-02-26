@@ -1152,6 +1152,14 @@ TOOLS:
 6. shell — コマンド実行: {"tool":"shell","command":"python app.py"}
 7. done — 完了報告: {"tool":"done","summary":"## 完了\\n\\n作成ファイル:\\n- app.py\\n\\n実行方法: python app.py"}
 
+WORKFLOW — Follow this order:
+1. PLAN: Think about what files and structure you need before writing any code.
+2. CREATE: Write all files using file_write. Write COMPLETE, working code in each file.
+3. SETUP: Install dependencies (pip install, npm install) if needed.
+4. VERIFY: Run the program to check it works.
+5. FIX: If there's an error, read the error carefully, fix the root cause. Do NOT repeat the same fix.
+6. DONE: Call done with a summary of what was created.
+
 EXAMPLE 1 — Creating a file:
 \`\`\`tool
 {"tool":"file_write","path":"main.py","content":"import random\\n\\ndef roll():\\n    return random.randint(1,6)\\n\\nprint(f'You rolled: {roll()}')"}
@@ -1175,7 +1183,7 @@ EXAMPLE 4 — Finishing:
 {"tool":"done","summary":"## 完了\\n\\nサイコロプログラムを作成しました。\\n\\n### 作成ファイル\\n- main.py — サイコロを振るプログラム\\n\\n### 実行方法\\n\`python main.py\`"}
 \`\`\`
 
-RULES:
+CRITICAL RULES:
 - Output EXACTLY ONE \`\`\`tool block per response. No exceptions.
 - Path is relative to workspace. Never use absolute paths.
 - Use file_edit to modify existing files — find the exact old_string and replace with new_string.
@@ -1185,7 +1193,31 @@ RULES:
 - Always finish with "done" tool. The summary should use Markdown formatting.
 - Explanations: 1 sentence in Japanese AFTER the tool block.
 - NEVER output code outside of file_write. No raw code blocks.
-- NEVER use rm -rf or destructive commands.`;
+- NEVER use rm -rf or destructive commands.
+
+ANTI-LOOP RULES — EXTREMELY IMPORTANT:
+- If the same shell command fails TWICE with the same error, do NOT run it again. Fix the root cause or try a completely different approach.
+- If file_edit fails, do NOT retry with the same old_string. Use file_read to see the actual file content first.
+- NEVER edit the same file more than 3 times total. If it still doesn't work, rewrite the entire file with file_write.
+- If you are stuck in a loop, call done immediately and explain what went wrong.
+- When an error occurs, read the FULL error message and fix the actual root cause, not a guess.
+
+ERROR FIXING RULES — CRITICAL:
+- When a Python IndentationError or SyntaxError occurs: ALWAYS rewrite the ENTIRE file using file_write. Do NOT use file_edit for fixing indentation. JSON encoding can corrupt indentation.
+- When any runtime error occurs after file_edit: use file_read first to see the actual file state, then rewrite with file_write.
+- file_edit is ONLY for small, simple single-line replacements where indentation does not change. For anything involving indentation changes, use file_write to rewrite the whole file.
+
+CODING BEST PRACTICES:
+- Write simple, complete, working code. Include ALL necessary imports, functions, and error handling from the start.
+- For GitHub data: use the GitHub REST API (https://api.github.com). Example: GET /search/repositories?q=stars:>1000&sort=stars
+- For web APIs: use 'requests' library in Python or built-in 'fetch' in Node.js.
+- NEVER use web scraping (BeautifulSoup, cheerio) when an official API exists.
+- Include proper error handling in your code from the first version.
+- Write the COMPLETE file content in file_write. Do not leave placeholders or TODOs.
+- For Python: ensure consistent indentation (4 spaces). Test indentation visually before writing.
+- For interactive programs: do NOT use input() for CLIs run from shell tool. Use command-line arguments or hardcoded test values instead.
+- NEVER put actual newlines inside f-strings or string literals. Use separate print() calls or string concatenation instead.
+- Keep your code simple and straightforward. A working simple solution is better than a broken complex one.`;
 
 // Execute a coding agent tool
 function executeCodingTool(action) {
@@ -1200,8 +1232,44 @@ function executeCodingTool(action) {
       if (!fullPath.startsWith(AGENT_WORKSPACE)) throw new Error("Path outside workspace");
       const dir = path.dirname(fullPath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(fullPath, action.content, "utf8");
-      return "File written: " + action.path + " (" + action.content.length + " bytes)";
+
+      let content = action.content;
+
+      // Auto-fix: repair newlines inside Python string literals
+      // This happens when LLM outputs \n in JSON which gets decoded to actual newlines
+      if (action.path.endsWith(".py")) {
+        const lines = content.split("\n");
+        const fixed = [];
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          // Check if line has an unclosed string (odd number of unescaped quotes)
+          const singleQ = (line.match(/(?:^|[^\\])'/g) || []).length;
+          const doubleQ = (line.match(/(?:^|[^\\])"/g) || []).length;
+          const fstringOpen = (line.match(/f'/g) || []).length;
+          // If a line has unclosed single or double quotes, join with next line using \n
+          if ((singleQ % 2 !== 0 || doubleQ % 2 !== 0) && i + 1 < lines.length) {
+            // Check next line closes the string
+            const nextLine = lines[i + 1];
+            const nextSingleQ = (nextLine.match(/(?:^|[^\\])'/g) || []).length;
+            const nextDoubleQ = (nextLine.match(/(?:^|[^\\])"/g) || []).length;
+            if (singleQ % 2 !== 0 && nextSingleQ % 2 !== 0) {
+              fixed.push(line + "\\n" + nextLine);
+              i++; // skip next line
+              continue;
+            }
+            if (doubleQ % 2 !== 0 && nextDoubleQ % 2 !== 0) {
+              fixed.push(line + "\\n" + nextLine);
+              i++; // skip next line
+              continue;
+            }
+          }
+          fixed.push(line);
+        }
+        content = fixed.join("\n");
+      }
+
+      fs.writeFileSync(fullPath, content, "utf8");
+      return "File written: " + action.path + " (" + content.length + " bytes)";
     }
     case "file_edit": {
       const fullPath = path.resolve(AGENT_WORKSPACE, action.path);
@@ -1323,27 +1391,79 @@ function executeCodingTool(action) {
   }
 }
 
+// Repair JSON that contains actual newlines inside string values
+function repairJSON(raw) {
+  // Try as-is first
+  try { return JSON.parse(raw); } catch(e) {}
+
+  // Strategy 1: Replace actual newlines inside strings with \n
+  // Find the "content" field value and escape newlines within it
+  const contentMatch = raw.match(/"content"\s*:\s*"([\s\S]*)"(\s*\})\s*$/);
+  if (contentMatch) {
+    const before = raw.slice(0, raw.indexOf(contentMatch[1]));
+    const content = contentMatch[1];
+    const after = contentMatch[2];
+    const escaped = content
+      .replace(/\\/g, "\\\\")  // escape backslashes first
+      .replace(/\n/g, "\\n")   // escape actual newlines
+      .replace(/\r/g, "\\r")   // escape carriage returns
+      .replace(/\t/g, "\\t");  // escape tabs
+    try { return JSON.parse(before + escaped + after); } catch(e) {}
+  }
+
+  // Strategy 2: Brute force — escape ALL actual newlines between quotes
+  const fixed = raw.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
+  try { return JSON.parse(fixed); } catch(e) {}
+
+  // Strategy 3: Extract fields manually for file_write
+  const toolMatch = raw.match(/"tool"\s*:\s*"(\w+)"/);
+  const pathMatch = raw.match(/"path"\s*:\s*"([^"]+)"/);
+  if (toolMatch && toolMatch[1] === "file_write" && pathMatch) {
+    // Extract content between first "content":" and last "}
+    const cIdx = raw.indexOf('"content"');
+    if (cIdx !== -1) {
+      const colonIdx = raw.indexOf(':', cIdx);
+      const quoteIdx = raw.indexOf('"', colonIdx + 1);
+      // Find the last "} pattern
+      let endIdx = raw.lastIndexOf('"}');
+      if (endIdx === -1) endIdx = raw.lastIndexOf('"');
+      if (quoteIdx !== -1 && endIdx > quoteIdx) {
+        const content = raw.slice(quoteIdx + 1, endIdx)
+          .replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\r/g, "\r")
+          .replace(/\n/g, "\n"); // normalize
+        return { tool: "file_write", path: pathMatch[1], content: content };
+      }
+    }
+  }
+
+  return null;
+}
+
 // Parse tool JSON from LLM response — robust multi-fallback
 function parseCodingTool(text) {
   // 1. Standard ```tool ... ``` fenced block
   const fenced = text.match(/```tool\s*\n?([\s\S]*?)```/);
   if (fenced) {
-    try { return JSON.parse(fenced[1].trim()); } catch(e) {}
+    const result = repairJSON(fenced[1].trim());
+    if (result) return result;
   }
   // 2. Any ```json or ``` block containing "tool":
   const anyFence = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
   if (anyFence && anyFence[1].includes('"tool"')) {
-    try { return JSON.parse(anyFence[1].trim()); } catch(e) {}
+    const result = repairJSON(anyFence[1].trim());
+    if (result) return result;
   }
   // 3. Single-line JSON with "tool" key
   const singleLine = text.match(/\{[^{}]*"tool"\s*:\s*"[^"]+?"[^{}]*\}/);
   if (singleLine) {
-    try { return JSON.parse(singleLine[0]); } catch(e) {}
+    const result = repairJSON(singleLine[0]);
+    if (result) return result;
   }
   // 4. Multi-line JSON (for file_write with long content)
   const multiLine = text.match(/\{[\s\S]*?"tool"\s*:\s*"[^"]+?"[\s\S]*?\n\s*\}/);
   if (multiLine) {
-    try { return JSON.parse(multiLine[0]); } catch(e) {}
+    const result = repairJSON(multiLine[0]);
+    if (result) return result;
   }
   // 5. Heuristic: detect intent from natural language
   const doneMatch = text.match(/(?:完了|done|finished|タスク.*完了)/i);
@@ -1439,6 +1559,21 @@ async function runCodingAgent(message, sessionKey, model, ollamaUrl, res) {
   let parseFailures = 0;
   let toolStep = 0;
 
+  // Loop detection — track recent actions for repetition detection
+  const recentActions = []; // [{tool, target, resultHash}]
+  function getActionKey(tool) {
+    if (tool.tool === "shell") return "shell:" + tool.command;
+    if (tool.tool === "file_edit") return "edit:" + tool.path + ":" + (tool.old_string || "").slice(0, 50);
+    return tool.tool + ":" + (tool.path || tool.pattern || "");
+  }
+  function detectLoop(tool) {
+    const key = getActionKey(tool);
+    const similar = recentActions.filter(a => a.key === key);
+    return similar.length >= 2; // Same action attempted 2+ times already
+  }
+  // Track file edit counts per file
+  const fileEditCounts = {};
+
   for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
     // Ask LLM for next tool call
     emitActivity(res, "agent", "running", { action: "thinking", detail: "ステップ " + (iteration + 1) + "/" + MAX_ITERATIONS });
@@ -1478,6 +1613,27 @@ async function runCodingAgent(message, sessionKey, model, ollamaUrl, res) {
     parseFailures = 0;
     toolStep++;
 
+    // --- Loop Detection ---
+    if (tool.tool !== "done" && detectLoop(tool)) {
+      console.log("[Agent] Loop detected at step " + toolStep + " — forcing different approach");
+      const loopMsg = "LOOP DETECTED: You have already tried this exact same action twice. You MUST either:\n1. Try a completely different approach\n2. Rewrite the entire file from scratch with file_write instead of file_edit\n3. If you cannot fix it, call done and explain what went wrong\n\nDo NOT repeat the same action.";
+      agentMessages.push({ role: "user", content: loopMsg });
+      continue;
+    }
+
+    // Track file edit count
+    if (tool.tool === "file_edit" && tool.path) {
+      fileEditCounts[tool.path] = (fileEditCounts[tool.path] || 0) + 1;
+      if (fileEditCounts[tool.path] > 3) {
+        console.log("[Agent] Too many edits to " + tool.path + " — forcing rewrite");
+        agentMessages.push({ role: "user", content: "You have edited " + tool.path + " too many times (" + fileEditCounts[tool.path] + "). The file is likely broken. Use file_read to see the current state, then REWRITE the entire file with file_write." });
+        continue;
+      }
+    }
+
+    // Record action for loop detection
+    recentActions.push({ key: getActionKey(tool), step: toolStep });
+
     // Extract and stream explanation text (only on successful parse)
     const explanationText = llmResponse
       .replace(/```(?:tool|json)?\s*\n?[\s\S]*?```/g, "")
@@ -1512,8 +1668,20 @@ async function runCodingAgent(message, sessionKey, model, ollamaUrl, res) {
       emitActivity(res, "agent", "done", { action: toolLabel, detail: "エラー: " + e.message });
     }
 
-    // Feed result back to LLM
-    agentMessages.push({ role: "user", content: "Tool result:\n" + result + "\n\nContinue with the next tool call." });
+    // Enhanced feedback — include iteration count and guidance on errors
+    let feedback = "Tool result:\n" + result;
+    if (result.startsWith("Error:") || result.includes("Error") || result.includes("Traceback")) {
+      // Detect specific error types and give targeted guidance
+      if (result.includes("IndentationError") || result.includes("SyntaxError")) {
+        feedback += "\n\nCRITICAL: IndentationError/SyntaxError detected. You MUST rewrite the ENTIRE file using file_write (not file_edit). file_edit corrupts indentation.";
+      } else if (result.includes("ModuleNotFoundError") || result.includes("No module named")) {
+        feedback += "\n\nMissing module. Install it with: shell → pip install <module_name>";
+      } else {
+        feedback += "\n\nThe tool returned an error. Read the error carefully and fix the root cause. Do NOT retry the same approach.";
+      }
+    }
+    feedback += "\n\nStep " + (iteration + 1) + "/" + MAX_ITERATIONS + ". Continue with the next tool call.";
+    agentMessages.push({ role: "user", content: feedback });
 
     // Sliding window: keep system + original user + last N tool/response pairs
     if (agentMessages.length > 16) {
