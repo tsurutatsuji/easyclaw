@@ -1,14 +1,22 @@
 {
-  "name": "easyclaw-api",
+  "name": "easyclaw",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "完全無料・VPS不要のローカルAIチャットアプリ",
+  "main": "electron/main.js",
   "scripts": {
     "start": "node server.js",
+    "electron:dev": "electron .",
+    "dist:win": "electron-builder --win",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ai",
+    "ollama",
+    "local",
+    "chat",
+    "electron"
+  ],
+  "author": "tsurutatsuji",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -18,5 +26,41 @@
     "morgan": "^1.10.1",
     "nodemailer": "^8.0.1",
     "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.easyclaw.app",
+    "productName": "EasyClaw",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "server.js",
+      "public/**/*",
+      "electron/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "users.db",
+        "to": "users.db",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }
