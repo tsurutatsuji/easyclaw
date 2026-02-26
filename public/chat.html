@@ -201,6 +201,7 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 <a href="/setup.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>設定</a>
 <a onclick="showChatHelp()" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>ヘルプ</a>
 <a onclick="doLogout()" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>ログアウト</a>
+<a onclick="setLang(LANG==='ja'?'en':'ja')" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><span id="langBtn">EN</span></a>
 </div>
 </div>
 <div class="main">
@@ -274,12 +275,102 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 var T = localStorage.getItem("token");
 if (!T) location.href = "/app.html";
 
+// --- i18n (日本語/English) ---
+var LANG = localStorage.getItem("easyclaw-lang") || "ja";
+var I18N = {
+  ja: {
+    newChat: "新しいチャット", inputPlaceholder: "メッセージを入力...",
+    settings: "設定", help: "ヘルプ", logout: "ログアウト", attach: "ファイル添付",
+    greeting_morning: "おはようございます", greeting_afternoon: "こんにちは", greeting_evening: "こんばんは",
+    welcome_sub: "何でも聞いてください",
+    tip_github: "GitHub", tip_github_desc: "Git初期化・リポジトリ管理",
+    tip_code: "コード生成", tip_code_desc: "プログラミングを手伝ってもらう",
+    tip_browser: "ブラウザ", tip_browser_desc: "AIがウェブを閲覧して情報を取得",
+    tip_git: "Git操作", tip_git_desc: "コミット・プッシュ・PR作成",
+    connecting: "接続中", connected: "Ollama接続中", offline: "オフライン",
+    today: "今日", yesterday: "昨日", thisWeek: "今週", older: "それ以前",
+    changes: "変更", clean: "クリーン", files: "ファイル",
+    stepsCompleted: "ステップ完了",
+    help_title: "使い方ガイド",
+    help_send: "メッセージ送信", help_send_desc: "入力欄にテキストを打って Enter キーで送信。Shift+Enter で改行。",
+    help_model: "モデル切り替え", help_model_desc: "入力欄の右下にあるモデル名をクリックすると、別のAIモデルに切り替えられます。",
+    help_new: "新しいチャット", help_new_desc: "サイドバーの「+」ボタンで新しい会話を開始できます。",
+    help_agent: "エージェント機能", help_agent_desc: "OpenClaw Gatewayが起動中なら、AIはツール呼び出しやタスク実行が可能です。",
+    help_offline: "AIが反応しない場合", help_offline_desc: "右上の「Ollama」がオフラインなら ollama serve を実行してください。",
+    help_settings: "設定変更", help_settings_desc: "サイドバーの「設定」からモデルやGatewayの設定を変更できます。",
+    act_planning: "タスク分析", act_thinking: "判断中", act_file_write: "ファイル書き込み",
+    act_file_edit: "ファイル編集", act_file_read: "ファイル読み取り", act_list_files: "ファイル一覧",
+    act_grep: "コード検索", act_shell: "コマンド実行", act_search: "検索",
+    orch_chat: "高速レスポンス", orch_coding: "コーディングエージェント", orch_reasoning: "深い推論",
+    orch_browser: "ブラウザエージェント", orch_manual: "手動選択",
+    lang_toggle: "EN"
+  },
+  en: {
+    newChat: "New Chat", inputPlaceholder: "Type a message...",
+    settings: "Settings", help: "Help", logout: "Logout", attach: "Attach file",
+    greeting_morning: "Good morning", greeting_afternoon: "Hello", greeting_evening: "Good evening",
+    welcome_sub: "Ask me anything",
+    tip_github: "GitHub", tip_github_desc: "Initialize Git & manage repos",
+    tip_code: "Code", tip_code_desc: "Get help with programming",
+    tip_browser: "Browser", tip_browser_desc: "AI browses the web for you",
+    tip_git: "Git", tip_git_desc: "Commit, push & create PRs",
+    connecting: "Connecting", connected: "Ollama connected", offline: "Offline",
+    today: "Today", yesterday: "Yesterday", thisWeek: "This week", older: "Older",
+    changes: "changes", clean: "clean", files: "files",
+    stepsCompleted: "steps completed",
+    help_title: "Usage Guide",
+    help_send: "Send message", help_send_desc: "Type in the input box and press Enter to send. Shift+Enter for newline.",
+    help_model: "Switch model", help_model_desc: "Click the model name at the bottom right to switch AI models.",
+    help_new: "New chat", help_new_desc: "Click the \"+\" button in the sidebar to start a new conversation.",
+    help_agent: "Agent mode", help_agent_desc: "When OpenClaw Gateway is running, AI can call tools and execute tasks.",
+    help_offline: "AI not responding", help_offline_desc: "If Ollama is offline, run 'ollama serve'. If GW is OFF, start Gateway from setup.",
+    help_settings: "Settings", help_settings_desc: "Change model and Gateway settings from sidebar Settings.",
+    act_planning: "Planning", act_thinking: "Thinking", act_file_write: "Writing file",
+    act_file_edit: "Editing file", act_file_read: "Reading file", act_list_files: "Listing files",
+    act_grep: "Searching code", act_shell: "Running command", act_search: "Searching",
+    orch_chat: "Fast response", orch_coding: "Coding agent", orch_reasoning: "Deep reasoning",
+    orch_browser: "Browser agent", orch_manual: "Manual",
+    lang_toggle: "JP"
+  }
+};
+function t(key) { return (I18N[LANG] || I18N.ja)[key] || key; }
+function setLang(lang) {
+  LANG = lang; localStorage.setItem("easyclaw-lang", lang);
+  // Update static elements
+  document.getElementById("chatInput").placeholder = t("inputPlaceholder");
+  document.getElementById("topTitle").textContent = curSession ? document.getElementById("topTitle").textContent : t("newChat");
+  document.querySelector(".w-sub").textContent = t("welcome_sub");
+  document.getElementById("langBtn").textContent = t("lang_toggle");
+  // Sidebar footer
+  var footerLinks = document.querySelectorAll(".sb-footer a");
+  if (footerLinks[0]) footerLinks[0].lastChild.textContent = t("settings");
+  if (footerLinks[1]) footerLinks[1].lastChild.textContent = t("help");
+  if (footerLinks[2]) footerLinks[2].lastChild.textContent = t("logout");
+  // Tip cards
+  var tips = document.querySelectorAll(".tip-title");
+  var descs = document.querySelectorAll(".tip-desc");
+  if (tips[0]) { tips[0].textContent = "🐙 " + t("tip_github"); descs[0].textContent = t("tip_github_desc"); }
+  if (tips[1]) { tips[1].textContent = "💻 " + t("tip_code"); descs[1].textContent = t("tip_code_desc"); }
+  if (tips[2]) { tips[2].textContent = "🖥️ " + t("tip_browser"); descs[2].textContent = t("tip_browser_desc"); }
+  if (tips[3]) { tips[3].textContent = "🔀 " + t("tip_git"); descs[3].textContent = t("tip_git_desc"); }
+  // Help popup
+  var helpTitle = document.querySelector(".help-popup-chat h3");
+  if (helpTitle) helpTitle.textContent = "💡 " + t("help_title");
+  setGreeting();
+  // Reload sessions to update date labels
+  loadSessions();
+}
+
 var curSession = null, sessions = [], busy = false, attachedFiles = [], currentModel = "", userSettings = null, gatewayOnline = false, currentActivities = [];
 
 function api(u, o) { o = o || {}; o.headers = Object.assign({ "Authorization": "Bearer " + T, "Content-Type": "application/json" }, o.headers || {}); return fetch(u, o).then(function(r) { return r.json() }) }
 
 async function init() {
   setGreeting();
+  // Apply saved language
+  document.getElementById("chatInput").placeholder = t("inputPlaceholder");
+  document.getElementById("langBtn").textContent = t("lang_toggle");
+  document.querySelector(".w-sub").textContent = t("welcome_sub");
   await loadSettings();
   await checkHealth();
   await loadSessions();
@@ -295,9 +386,9 @@ async function loadWorkspaceStatus() {
     if (ws.git) {
       html += '<span class="ws-branch">⎇ ' + esc(ws.git.branch || "main") + '</span>';
       if (ws.git.changed > 0) {
-        html += '<span class="ws-stat changes">' + ws.git.changed + ' 変更</span>';
+        html += '<span class="ws-stat changes">' + ws.git.changed + ' ' + t("changes") + '</span>';
       } else {
-        html += '<span class="ws-stat clean">✓ クリーン</span>';
+        html += '<span class="ws-stat clean">✓ ' + t("clean") + '</span>';
       }
       if (ws.git.ahead > 0) html += '<span class="ws-stat" style="color:var(--green)">↑' + ws.git.ahead + '</span>';
       if (ws.git.behind > 0) html += '<span class="ws-stat" style="color:var(--accent)">↓' + ws.git.behind + '</span>';
@@ -310,7 +401,7 @@ async function loadWorkspaceStatus() {
       if (gitTip) gitTip.style.display = "";
     } else {
       html += '<span class="ws-path">📁 ~/easyclaw-workspace</span>';
-      html += '<span class="ws-stat clean">' + (ws.files || 0) + ' ファイル</span>';
+      html += '<span class="ws-stat clean">' + (ws.files || 0) + ' ' + t("files") + '</span>';
       html += '<span class="ws-btn" onclick="insertPrompt(\'ワークスペースにgit initして\')" title="Git初期化">⊕ git init</span>';
     }
     bar.innerHTML = html;
@@ -318,7 +409,7 @@ async function loadWorkspaceStatus() {
   } catch(e) { /* ignore */ }
 }
 
-function setGreeting() { var h = new Date().getHours(); document.getElementById("greeting").textContent = h < 5 ? "こんばんは" : h < 12 ? "おはようございます" : h < 18 ? "こんにちは" : "こんばんは" }
+function setGreeting() { var h = new Date().getHours(); document.getElementById("greeting").textContent = h < 5 ? t("greeting_evening") : h < 12 ? t("greeting_morning") : h < 18 ? t("greeting_afternoon") : t("greeting_evening") }
 
 async function loadSettings() {
   try {
@@ -416,7 +507,7 @@ function renderSB() {
   sessions.forEach(function(s) {
     var ts = new Date(s.updatedAt || s.createdAt).getTime();
     var diff = now - ts;
-    var lb = diff < 86400000 ? "今日" : diff < 172800000 ? "昨日" : diff < 604800000 ? "今週" : "それ以前";
+    var lb = diff < 86400000 ? t("today") : diff < 172800000 ? t("yesterday") : diff < 604800000 ? t("thisWeek") : t("older");
     if (lb !== prev) { html += '<div class="sb-label">' + lb + '</div>'; prev = lb }
     var ac = s.sessionKey === curSession ? " active" : "";
     html += '<div class="sb-item' + ac + '" onclick="openSession(\'' + esc(s.sessionKey) + '\')">' + esc(s.title || "チャット") + '</div>';
@@ -507,7 +598,9 @@ async function send() {
           if (data.orchestrator && typing) {
             var catIcons = { agent: "🤖", coding: "💻", reasoning: "🧠", chat: "💬", manual: "🎯", browser: "🖥️" };
             var orchIcon = catIcons[data.orchestrator.category] || "🤖";
-            var orchLabel = '<div class="orch-label">' + orchIcon + ' ' + esc(data.orchestrator.model) + ' <span class="orch-reason">' + esc(data.orchestrator.reason) + '</span></div>';
+            var reasonMap = { "高速レスポンス": t("orch_chat"), "コーディングエージェント": t("orch_coding"), "深い推論": t("orch_reasoning"), "ブラウザエージェント": t("orch_browser"), "手動選択": t("orch_manual") };
+            var reason = reasonMap[data.orchestrator.reason] || data.orchestrator.reason;
+            var orchLabel = '<div class="orch-label">' + orchIcon + ' ' + esc(data.orchestrator.model) + ' <span class="orch-reason">' + esc(reason) + '</span></div>';
             typing.querySelector(".msg-content").insertAdjacentHTML("afterbegin", orchLabel);
           }
           // Agent activity event — Claude Code style progress
@@ -573,7 +666,7 @@ async function send() {
 
 function showChat() { document.getElementById("welcome").classList.add("hidden"); var m = document.getElementById("messages"); m.classList.add("show"); document.getElementById("chatInput").focus() }
 function clearMessages() { document.getElementById("messages").innerHTML = "" }
-function showWelcome() { document.getElementById("welcome").classList.remove("hidden"); document.getElementById("messages").classList.remove("show"); document.getElementById("messages").innerHTML = ""; document.getElementById("topTitle").textContent = "新しいチャット" }
+function showWelcome() { document.getElementById("welcome").classList.remove("hidden"); document.getElementById("messages").classList.remove("show"); document.getElementById("messages").innerHTML = ""; document.getElementById("topTitle").textContent = t("newChat") }
 function newChat() { curSession = null; renderSB(); showWelcome(); closeSB(); document.getElementById("chatInput").focus() }
 
 function hk(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }
@@ -635,7 +728,7 @@ function parseActivityInfo(data) {
     label = ba[data.params.action] || data.params.action;
     if (data.params.action.includes("ブラウザ")) label = data.params.action;
   } else if (tool === "agent" && data.params && data.params.action) {
-    var ca = { planning: "タスク分析", thinking: "判断中", file_write: "ファイル書き込み", file_edit: "ファイル編集", file_read: "ファイル読み取り", list_files: "ファイル一覧", grep: "コード検索", shell: "コマンド実行", search: "検索" };
+    var ca = { planning: t("act_planning"), thinking: t("act_thinking"), file_write: t("act_file_write"), file_edit: t("act_file_edit"), file_read: t("act_file_read"), list_files: t("act_list_files"), grep: t("act_grep"), shell: t("act_shell"), search: t("act_search") };
     label = ca[data.params.action] || data.params.action;
   } else {
     var tl = { web_fetch: "ウェブ取得", shell: "コマンド実行", read_file: "ファイル読み取り", browser: "ブラウザ操作", search: "検索", agent: "エージェント" };
@@ -659,7 +752,7 @@ function renderProgressPanel(activities, allDone) {
   }
   var lines = [];
   if (hidden > 0) {
-    lines.push('<div class="ap-step"><span class="ap-mark" style="opacity:.3">⋯</span><span style="opacity:.4">' + hidden + ' ステップ完了</span></div>');
+    lines.push('<div class="ap-step"><span class="ap-mark" style="opacity:.3">⋯</span><span style="opacity:.4">' + hidden + ' ' + t("stepsCompleted") + '</span></div>');
   }
   visible.forEach(function(a, i) {
     var isLast = (i === visible.length - 1);

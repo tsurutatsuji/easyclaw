@@ -33,7 +33,8 @@ function auth(req, res, next) {
 }
 
 // --- Database ---
-const db = new Database(path.join(__dirname, "users.db"));
+const DB_PATH = process.env.EASYCLAW_DB_PATH || path.join(__dirname, "users.db");
+const db = new Database(DB_PATH);
 db.exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT, createdAt TEXT)");
 db.exec("CREATE TABLE IF NOT EXISTS otp_codes (id INTEGER PRIMARY KEY, email TEXT, code TEXT, expiresAt TEXT, used INTEGER DEFAULT 0)");
 try { db.exec("ALTER TABLE users ADD COLUMN emailVerified INTEGER DEFAULT 0"); } catch(e) {}
@@ -1763,11 +1764,15 @@ process.on("SIGINT", () => {
 });
 
 // --- Start Server ---
-app.listen(3000, "0.0.0.0", () => {
-  console.log("EasyClaw API running on port 3000");
+const EASYCLAW_HOST = process.env.EASYCLAW_HOST || "0.0.0.0";
+const server = app.listen(3000, EASYCLAW_HOST, () => {
+  console.log("EasyClaw API running on port 3000 (" + EASYCLAW_HOST + ")");
   console.log("OpenClaw Gateway port:", OPENCLAW_GATEWAY_PORT);
   // Auto-start Gateway on boot
   autoStartGateway();
   // Pre-warm Ollama model so first chat is fast
   setTimeout(prewarmOllama, 1000);
 });
+
+// Export for Electron
+module.exports = { app, server };
