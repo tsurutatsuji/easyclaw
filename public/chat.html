@@ -47,6 +47,18 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 .tb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(0,255,65,0.4)}
 .tb-dot.off{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.4)}
 
+/* Workspace bar */
+.ws-bar{display:none;height:32px;align-items:center;gap:8px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.04);flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);background:rgba(5,5,5,0.6);overflow:hidden}
+.ws-bar.show{display:flex}
+.ws-bar .ws-branch{display:inline-flex;align-items:center;gap:4px;color:var(--green);background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.12);padding:2px 8px;border-radius:4px;font-size:10px;white-space:nowrap}
+.ws-bar .ws-path{color:var(--text3);opacity:.6;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-bar .ws-stat{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;font-size:10px;white-space:nowrap}
+.ws-bar .ws-stat.changes{color:var(--accent);background:rgba(232,86,42,0.08);border:1px solid rgba(232,86,42,0.15)}
+.ws-bar .ws-stat.clean{color:var(--text3);opacity:.5}
+.ws-bar .ws-files{color:var(--text3);opacity:.5;font-size:10px;margin-left:auto;white-space:nowrap}
+.ws-bar .ws-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:4px;font-size:10px;color:var(--text2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);cursor:pointer;white-space:nowrap;transition:all .15s}
+.ws-bar .ws-btn:hover{background:rgba(0,255,65,0.05);color:var(--green);border-color:rgba(0,255,65,0.2)}
+
 /* Content */
 .content-area{flex:1;display:flex;flex-direction:column;min-height:0}
 .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
@@ -60,20 +72,27 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 .messages.show{display:block}
 .messages::-webkit-scrollbar{width:4px}
 .messages::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:4px}
-.msg-wrap{padding:18px 0}
-.msg-wrap.assistant{background:rgba(255,255,255,0.01)}
-.msg-inner{max-width:700px;margin:0 auto;padding:0 24px;display:flex;gap:12px}
+.msg-wrap{padding:10px 0}
+.msg-wrap.assistant{background:transparent}
+.msg-inner{max-width:700px;margin:0 auto;padding:0 24px;display:flex;gap:10px;align-items:flex-end}
 .msg-wrap.user .msg-inner{flex-direction:row-reverse}
-.msg-icon{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:2px}
+.msg-icon{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
 .msg-icon.u{background:var(--accent);color:#fff;font-weight:600;font-size:9px;letter-spacing:.5px}
 .msg-icon.a{background:rgba(0,255,65,0.08);color:var(--green);font-size:14px;border:1px solid rgba(0,255,65,0.1)}
-.msg-content{flex:1;min-width:0;font-size:14px;line-height:1.8;font-weight:400;color:var(--text)}
-.msg-wrap.user .msg-content{text-align:left}
+.msg-content{max-width:80%;min-width:0;font-size:14px;line-height:1.8;font-weight:400;color:var(--text)}
+.msg-wrap.user .msg-content{background:rgba(232,86,42,0.12);border:1px solid rgba(232,86,42,0.18);padding:10px 16px;border-radius:18px 18px 4px 18px;text-align:left}
+.msg-wrap.assistant .msg-content{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);padding:10px 16px;border-radius:18px 18px 18px 4px}
 .msg-content p{margin-bottom:8px}.msg-content p:last-child{margin-bottom:0}
 .msg-content strong{font-weight:600;color:var(--text)}
 .msg-content code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.08);padding:1px 6px;border-radius:4px;color:var(--green)}
 .msg-content pre{background:var(--dark);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin:12px 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7}
 .msg-content pre code{background:none;border:none;padding:0;color:var(--text)}
+.msg-content h2.md-h,.msg-content h3.md-h,.msg-content h4.md-h{margin:14px 0 6px;color:var(--text);font-weight:600;line-height:1.4}
+.msg-content h2.md-h{font-size:16px}.msg-content h3.md-h{font-size:14px}.msg-content h4.md-h{font-size:13px}
+.msg-content ul.md-list,.msg-content ol.md-list{margin:6px 0;padding-left:20px;line-height:1.8;font-size:13px}
+.msg-content .md-list li{margin:2px 0}.msg-content .md-list li::marker{color:var(--text3)}
+.msg-content em{font-style:italic;color:var(--text2)}
+.msg-content a.md-link{color:var(--green);text-decoration:none;border-bottom:1px solid rgba(0,255,65,0.2)}.msg-content a.md-link:hover{border-bottom-color:var(--green)}
 .msg-time{font-size:10px;color:var(--text3);margin-top:6px;font-family:'JetBrains Mono',monospace}
 .msg-wrap.user .msg-time{text-align:right}
 
@@ -119,6 +138,50 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:15}
 .overlay.show{display:block}
 
+/* Quick tips on welcome */
+.quick-tips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;max-width:520px;justify-content:center}
+.tip-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 18px;cursor:pointer;transition:all .2s;flex:1;min-width:140px;max-width:240px;text-align:left}
+.tip-card:hover{border-color:rgba(0,255,65,0.2);background:rgba(0,255,65,0.02);transform:translateY(-2px)}
+.tip-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.tip-desc{font-size:11px;color:var(--text3);line-height:1.5}
+
+/* Help popup */
+.help-btn-chat{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);cursor:pointer;font-family:'JetBrains Mono',monospace;transition:color .2s;padding:4px 0}
+.help-btn-chat:hover{color:var(--green)}
+.help-btn-chat .qm{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(0,255,65,0.08);border:1px solid rgba(0,255,65,0.15);color:var(--green);font-size:9px;font-weight:700}
+
+.help-popup-chat{display:none;position:fixed;z-index:200;width:360px;max-width:90vw;background:var(--dark);border:1px solid rgba(0,255,65,0.15);border-radius:16px;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(20px);top:50%;left:50%;transform:translate(-50%,-50%)}
+.help-popup-chat.show{display:block}
+.help-popup-chat h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px}
+.help-popup-chat .close-help{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px}
+.help-popup-chat .close-help:hover{color:var(--text)}
+.help-popup-chat .help-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:var(--text2);line-height:1.7}
+.help-popup-chat .help-item:last-child{border-bottom:none}
+.help-popup-chat .help-item strong{color:var(--text);font-weight:500}
+.help-popup-chat .help-item code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,255,65,0.05);border:1px solid rgba(0,255,65,0.08);padding:1px 5px;border-radius:4px;color:var(--green)}
+.help-popup-chat a.help-ext{display:inline-flex;align-items:center;gap:4px;color:var(--green);text-decoration:none;font-size:12px;margin-top:10px;font-family:'JetBrains Mono',monospace}
+.help-popup-chat a.help-ext:hover{text-decoration:underline}
+.chat-help-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4)}
+.chat-help-overlay.show{display:block}
+
+/* Agent Progress — Claude Code style */
+.agent-progress{margin:8px 0 10px;border-left:2px solid rgba(0,255,65,0.12);padding-left:12px}
+.ap-step{display:flex;align-items:center;gap:6px;padding:2px 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);line-height:1.5}
+.ap-step.active{color:var(--green)}
+.ap-step .ap-mark{width:14px;flex-shrink:0;text-align:center;font-size:9px}
+.ap-spin{display:inline-block;width:8px;height:8px;border:1.5px solid rgba(0,255,65,0.2);border-top-color:var(--green);border-radius:50%;animation:spin .6s linear infinite}
+.ap-detail{opacity:.5;margin-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.agent-progress.all-done{opacity:.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Orchestrator label */
+.orch-label{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;padding:4px 0 6px;display:flex;align-items:center;gap:4px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:6px}
+.orch-reason{color:var(--text3);opacity:.6;font-size:9px}
+
+/* Gateway status in topbar */
+.tb-gw{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:12px;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)}
+.tb-gw.on{color:var(--green);border-color:rgba(0,255,65,0.15);background:rgba(0,255,65,0.03)}
+
 @media(max-width:768px){
 .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%)}
 .sidebar.open{transform:translateX(0)}
@@ -136,6 +199,7 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 <div class="sb-sessions" id="sessionList"></div>
 <div class="sb-footer">
 <a href="/setup.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>設定</a>
+<a onclick="showChatHelp()" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>ヘルプ</a>
 <a onclick="doLogout()" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>ログアウト</a>
 </div>
 </div>
@@ -145,13 +209,32 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 <button class="menu-btn" onclick="toggleSB()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg></button>
 <span class="tb-title" id="topTitle">新しいチャット</span>
 </div>
-<div class="tb-right"><div class="tb-status"><span class="tb-dot" id="statusDot"></span><span id="statusText">接続中</span></div></div>
+<div class="tb-right"><div class="tb-status"><span class="tb-dot" id="statusDot"></span><span id="statusText">接続中</span></div><span class="tb-gw" id="gwBadge">GW: ---</span></div>
 </div>
+<div class="ws-bar" id="wsBar"></div>
 <div class="content-area">
 <div class="welcome" id="welcome">
 <div class="w-icon">🦞</div>
 <div class="w-title" id="greeting"></div>
 <div class="w-sub">何でも聞いてください</div>
+<div class="quick-tips">
+  <div class="tip-card" onclick="insertPrompt('ワークスペースにgit initして、README.mdを作成して')">
+    <div class="tip-title">🐙 GitHub</div>
+    <div class="tip-desc">Git初期化・リポジトリ管理</div>
+  </div>
+  <div class="tip-card" onclick="insertPrompt('Pythonで簡単なWebスクレイパーを作って')">
+    <div class="tip-title">💻 コード生成</div>
+    <div class="tip-desc">プログラミングを手伝ってもらう</div>
+  </div>
+  <div class="tip-card" onclick="insertPrompt('https://example.com を開いて内容を教えて')">
+    <div class="tip-title">🖥️ ブラウザ</div>
+    <div class="tip-desc">AIがウェブを閲覧して情報を取得</div>
+  </div>
+  <div class="tip-card" id="gitTipCard" style="display:none" onclick="insertPrompt('変更をコミットして、プッシュして')">
+    <div class="tip-title">🔀 Git操作</div>
+    <div class="tip-desc">コミット・プッシュ・PR作成</div>
+  </div>
+</div>
 </div>
 <div class="messages" id="messages"></div>
 </div>
@@ -174,11 +257,24 @@ html,body{height:100%;font-family:'Inter','Noto Sans JP',-apple-system,sans-seri
 </div>
 <div class="model-popup" id="modelPopup"></div>
 <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf,.txt,.csv,.json,.md" onchange="handleFiles(this)">
+
+<div class="chat-help-overlay" id="chatHelpOverlay" onclick="closeChatHelp()"></div>
+<div class="help-popup-chat" id="chatHelpPopup">
+  <button class="close-help" onclick="closeChatHelp()">&times;</button>
+  <h3>💡 使い方ガイド</h3>
+  <div class="help-item"><strong>メッセージ送信</strong> — 入力欄にテキストを打って Enter キーで送信。Shift+Enter で改行。</div>
+  <div class="help-item"><strong>モデル切り替え</strong> — 入力欄の右下にあるモデル名をクリックすると、別のAIモデルに切り替えられます。</div>
+  <div class="help-item"><strong>新しいチャット</strong> — サイドバーの「+」ボタンで新しい会話を開始できます。</div>
+  <div class="help-item"><strong>エージェント機能</strong> — OpenClaw Gatewayが起動中（右上の「GW: ON」）なら、AIはツール呼び出しやタスク実行が可能です。処理中はチャット内にツールの実行状況が表示されます。</div>
+  <div class="help-item"><strong>AIが反応しない場合</strong> — 右上の「Ollama」がオフラインなら <code>ollama serve</code> を実行。「GW: OFF」ならセットアップ画面からGatewayを起動してください。</div>
+  <div class="help-item"><strong>設定変更</strong> — サイドバーの「設定」からモデルやGatewayの設定を変更できます。</div>
+  <a class="help-ext" href="https://ollama.com/library" target="_blank">↗ 利用可能なモデル一覧</a>
+</div>
 <script>
 var T = localStorage.getItem("token");
 if (!T) location.href = "/app.html";
 
-var curSession = null, sessions = [], busy = false, attachedFiles = [], currentModel = "", userSettings = null;
+var curSession = null, sessions = [], busy = false, attachedFiles = [], currentModel = "", userSettings = null, gatewayOnline = false, currentActivities = [];
 
 function api(u, o) { o = o || {}; o.headers = Object.assign({ "Authorization": "Bearer " + T, "Content-Type": "application/json" }, o.headers || {}); return fetch(u, o).then(function(r) { return r.json() }) }
 
@@ -187,7 +283,39 @@ async function init() {
   await loadSettings();
   await checkHealth();
   await loadSessions();
+  await loadWorkspaceStatus();
   document.getElementById("chatInput").focus();
+}
+
+async function loadWorkspaceStatus() {
+  try {
+    var ws = await api("/api/workspace/status");
+    var bar = document.getElementById("wsBar");
+    var html = "";
+    if (ws.git) {
+      html += '<span class="ws-branch">⎇ ' + esc(ws.git.branch || "main") + '</span>';
+      if (ws.git.changed > 0) {
+        html += '<span class="ws-stat changes">' + ws.git.changed + ' 変更</span>';
+      } else {
+        html += '<span class="ws-stat clean">✓ クリーン</span>';
+      }
+      if (ws.git.ahead > 0) html += '<span class="ws-stat" style="color:var(--green)">↑' + ws.git.ahead + '</span>';
+      if (ws.git.behind > 0) html += '<span class="ws-stat" style="color:var(--accent)">↓' + ws.git.behind + '</span>';
+      if (ws.git.remote) {
+        var repoName = ws.git.remote.replace(/.*[\/:]([^\/]+\/[^\/]+?)(?:\.git)?$/, "$1");
+        html += '<span class="ws-btn" onclick="insertPrompt(\'このリポジトリの状態を教えて\')" title="' + esc(ws.git.remote) + '">🐙 ' + esc(repoName) + '</span>';
+      }
+      // Show git tip card
+      var gitTip = document.getElementById("gitTipCard");
+      if (gitTip) gitTip.style.display = "";
+    } else {
+      html += '<span class="ws-path">📁 ~/easyclaw-workspace</span>';
+      html += '<span class="ws-stat clean">' + (ws.files || 0) + ' ファイル</span>';
+      html += '<span class="ws-btn" onclick="insertPrompt(\'ワークスペースにgit initして\')" title="Git初期化">⊕ git init</span>';
+    }
+    bar.innerHTML = html;
+    bar.classList.add("show");
+  } catch(e) { /* ignore */ }
 }
 
 function setGreeting() { var h = new Date().getHours(); document.getElementById("greeting").textContent = h < 5 ? "こんばんは" : h < 12 ? "おはようございます" : h < 18 ? "こんにちは" : "こんばんは" }
@@ -196,18 +324,23 @@ async function loadSettings() {
   try {
     var d = await api("/api/settings");
     userSettings = d.settings;
-    currentModel = userSettings.model || "llama3.2";
-    document.getElementById("modelLabel").textContent = currentModel;
+    currentModel = "auto";
+    document.getElementById("modelLabel").textContent = "🤖 auto";
     buildModelPopup();
   } catch(e) {
-    currentModel = "llama3.2";
-    document.getElementById("modelLabel").textContent = currentModel;
+    currentModel = "auto";
+    document.getElementById("modelLabel").textContent = "🤖 auto";
   }
 }
 
 async function buildModelPopup() {
   var popup = document.getElementById("modelPopup");
   var html = "";
+
+  // Auto-orchestration option
+  html += '<div class="mp-section">Orchestrator</div>';
+  var autoActive = currentModel === "auto" ? " active" : "";
+  html += '<div class="mp-item' + autoActive + '" onclick="setModel(\'auto\',this)">🤖 auto <span style="font-size:10px;color:var(--text3);margin-left:4px">タスクに応じて自動選択</span><span class="ck">✓</span></div>';
 
   if (!userSettings || userSettings.provider === "ollama") {
     html += '<div class="mp-section">Ollama (Local)</div>';
@@ -242,6 +375,7 @@ async function buildModelPopup() {
 }
 
 async function checkHealth() {
+  // Check Ollama
   try {
     if (!userSettings || userSettings.provider === "ollama") {
       var h = await api("/api/ollama/health");
@@ -252,6 +386,19 @@ async function checkHealth() {
       document.getElementById("statusText").textContent = "API接続中";
     }
   } catch(e) { document.getElementById("statusDot").className = "tb-dot off"; document.getElementById("statusText").textContent = "オフライン"; }
+
+  // Check Gateway
+  try {
+    var gw = await fetch("/api/openclaw/status").then(function(r){ return r.json() });
+    gatewayOnline = gw.running && gw.connected;
+    var badge = document.getElementById("gwBadge");
+    if (gatewayOnline) { badge.textContent = "GW: ON"; badge.className = "tb-gw on"; }
+    else if (gw.running) { badge.textContent = "GW: 起動中"; badge.className = "tb-gw"; }
+    else { badge.textContent = "GW: OFF"; badge.className = "tb-gw"; }
+  } catch(e) {
+    document.getElementById("gwBadge").textContent = "GW: ---";
+    document.getElementById("gwBadge").className = "tb-gw";
+  }
 }
 
 async function loadSessions() {
@@ -313,6 +460,7 @@ async function send() {
   var txt = inp.value.trim();
   if (!txt || busy) return;
   busy = true;
+  currentActivities = [];
   document.getElementById("sendBtn").disabled = true;
   inp.value = ""; ar(inp);
 
@@ -349,26 +497,58 @@ async function send() {
         if (jsonStr === "[DONE]") continue;
         try {
           var data = JSON.parse(jsonStr);
-          // Capture sessionKey from first message
+          // Capture sessionKey and orchestrator info from first message
           if (data.sessionKey && !curSession) {
             curSession = data.sessionKey;
           } else if (data.sessionKey && curSession === null) {
             curSession = data.sessionKey;
           }
+          // Show orchestrator model selection
+          if (data.orchestrator && typing) {
+            var catIcons = { agent: "🤖", coding: "💻", reasoning: "🧠", chat: "💬", manual: "🎯", browser: "🖥️" };
+            var orchIcon = catIcons[data.orchestrator.category] || "🤖";
+            var orchLabel = '<div class="orch-label">' + orchIcon + ' ' + esc(data.orchestrator.model) + ' <span class="orch-reason">' + esc(data.orchestrator.reason) + '</span></div>';
+            typing.querySelector(".msg-content").insertAdjacentHTML("afterbegin", orchLabel);
+          }
+          // Agent activity event — Claude Code style progress
+          if (data.type === "agent_activity") {
+            if (typing && data.status !== "done") {
+              currentActivities.push(parseActivityInfo(data));
+              var orchEl = typing.querySelector(".orch-label");
+              var orchHtml = orchEl ? orchEl.outerHTML : "";
+              var progressHtml = renderProgressPanel(currentActivities, false);
+              var textHtml = fullText ? '<div>' + fmt(fullText) + '</div>' : '<div class="typing-dots"><span></span><span></span><span></span></div>';
+              typing.querySelector(".msg-content").innerHTML = orchHtml + progressHtml + textHtml;
+              m.scrollTop = m.scrollHeight;
+            }
+          }
           if (data.content) {
             fullText += data.content;
             if (typing) {
-              typing.querySelector(".msg-content").innerHTML = '<div>' + fmt(fullText) + '</div>';
+              var orchEl = typing.querySelector(".orch-label");
+              var orchHtml = orchEl ? orchEl.outerHTML : "";
+              var progressHtml = renderProgressPanel(currentActivities, true);
+              typing.querySelector(".msg-content").innerHTML = orchHtml + progressHtml + '<div>' + fmt(fullText) + '</div>';
               m.scrollTop = m.scrollHeight;
             }
           }
           if (data.done) {
-            if (typing) typing.id = "";
-            // Set title from first user message
+            if (typing) {
+              // Final render with all activities marked done
+              var orchEl = typing.querySelector(".orch-label");
+              var orchHtml = orchEl ? orchEl.outerHTML : "";
+              var progressHtml = renderProgressPanel(currentActivities, true);
+              var textHtml = fullText ? '<div>' + fmt(fullText) + '</div>' : '';
+              typing.querySelector(".msg-content").innerHTML = orchHtml + progressHtml + textHtml;
+              typing.id = "";
+            }
+            currentActivities = [];
             if (txt) {
               var tt = txt.slice(0, 30) + (txt.length > 30 ? "..." : "");
               document.getElementById("topTitle").textContent = tt;
             }
+            // Auto-refresh workspace bar after agent operations
+            loadWorkspaceStatus();
           }
           if (data.error) {
             if (typing) {
@@ -401,14 +581,98 @@ function ar(el) { el.style.height = "auto"; el.style.height = Math.min(el.scroll
 function toggleSB() { document.getElementById("sidebar").classList.toggle("open"); document.getElementById("overlay").classList.toggle("show") }
 function closeSB() { document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show") }
 function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML }
-function fmt(t) { var h = esc(t); h = h.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>'); h = h.replace(/`([^`]+)`/g, '<code>$1</code>'); h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'); h = h.replace(/\n/g, '<br>'); return h }
+function fmt(t) {
+  var h = esc(t);
+  // 1. Extract code blocks (preserve from further processing)
+  var codeBlocks = [];
+  h = h.replace(/```(\w*)\n([\s\S]*?)```/g, function(m, lang, code) {
+    codeBlocks.push('<pre><code>' + code + '</code></pre>');
+    return '\n%%CB' + (codeBlocks.length - 1) + '%%\n';
+  });
+  // 2. Headers
+  h = h.replace(/^### (.+)$/gm, '<h4 class="md-h">$1</h4>');
+  h = h.replace(/^## (.+)$/gm, '<h3 class="md-h">$1</h3>');
+  h = h.replace(/^# (.+)$/gm, '<h2 class="md-h">$1</h2>');
+  // 3. Unordered lists (group consecutive - or * lines)
+  h = h.replace(/((?:^[-*] .+\n?)+)/gm, function(block) {
+    var items = block.trim().split('\n').map(function(l) { return '<li>' + l.replace(/^[-*] /, '') + '</li>'; });
+    return '<ul class="md-list">' + items.join('') + '</ul>\n';
+  });
+  // 4. Ordered lists
+  h = h.replace(/((?:^\d+\. .+\n?)+)/gm, function(block) {
+    var items = block.trim().split('\n').map(function(l) { return '<li>' + l.replace(/^\d+\. /, '') + '</li>'; });
+    return '<ol class="md-list">' + items.join('') + '</ol>\n';
+  });
+  // 5. Inline code
+  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // 6. Bold, italic
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/(?:^|\s)\*([^*]+)\*(?:\s|$)/g, ' <em>$1</em> ');
+  // 7. Links
+  h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a class="md-link" href="$2" target="_blank">$1</a>');
+  // 8. Line breaks (but not inside block elements)
+  h = h.replace(/\n/g, '<br>');
+  // 9. Clean up extra <br> around block elements
+  h = h.replace(/<br>\s*(<(?:ul|ol|h[234]|pre))/g, '$1');
+  h = h.replace(/(<\/(?:ul|ol|h[234]|pre)>)\s*<br>/g, '$1');
+  // 10. Restore code blocks
+  codeBlocks.forEach(function(block, i) { h = h.replace('%%CB' + i + '%%', block); });
+  return h;
+}
 function triggerFile() { document.getElementById("fileInput").click() }
 function handleFiles(input) { for (var i = 0; i < input.files.length; i++) attachedFiles.push(input.files[i]); renderFP(); input.value = "" }
 function renderFP() { document.getElementById("filePreview").innerHTML = attachedFiles.map(function(f, i) { return '<div class="file-tag">📎 ' + esc(f.name) + ' <span class="rm" onclick="rmFile(' + i + ')">×</span></div>' }).join("") }
 function rmFile(i) { attachedFiles.splice(i, 1); renderFP() }
 function toggleModel() { var mp = document.getElementById("modelPopup"); var btn = document.getElementById("modelBtn"); var r = btn.getBoundingClientRect(); mp.style.bottom = (window.innerHeight - r.top + 8) + "px"; mp.style.right = (window.innerWidth - r.right) + "px"; mp.classList.toggle("show") }
-function setModel(id, el) { currentModel = id; document.getElementById("modelLabel").textContent = id; document.querySelectorAll(".mp-item").forEach(function(e) { e.classList.remove("active") }); el.classList.add("active"); document.getElementById("modelPopup").classList.remove("show") }
+function setModel(id, el) { currentModel = id; document.getElementById("modelLabel").textContent = id === "auto" ? "🤖 auto" : id; document.querySelectorAll(".mp-item").forEach(function(e) { e.classList.remove("active") }); el.classList.add("active"); document.getElementById("modelPopup").classList.remove("show") }
 function doLogout() { localStorage.removeItem("token"); localStorage.removeItem("email"); location.href = "/app.html" }
+function insertPrompt(text) { var inp = document.getElementById("chatInput"); inp.value = text; inp.focus(); ar(inp) }
+function parseActivityInfo(data) {
+  var tool = data.tool || "tool";
+  var label = "処理中";
+  if (tool === "browser" && data.params && data.params.action) {
+    var ba = { snapshot: "ページ解析", thinking: "判断中", navigate: "ページ移動", click: "クリック", type: "テキスト入力", scroll: "スクロール", wait: "待機中" };
+    label = ba[data.params.action] || data.params.action;
+    if (data.params.action.includes("ブラウザ")) label = data.params.action;
+  } else if (tool === "agent" && data.params && data.params.action) {
+    var ca = { planning: "タスク分析", thinking: "判断中", file_write: "ファイル書き込み", file_edit: "ファイル編集", file_read: "ファイル読み取り", list_files: "ファイル一覧", grep: "コード検索", shell: "コマンド実行", search: "検索" };
+    label = ca[data.params.action] || data.params.action;
+  } else {
+    var tl = { web_fetch: "ウェブ取得", shell: "コマンド実行", read_file: "ファイル読み取り", browser: "ブラウザ操作", search: "検索", agent: "エージェント" };
+    label = tl[tool] || tool;
+  }
+  var detail = (data.params && data.params.detail) ? data.params.detail : "";
+  return { label: label, detail: detail };
+}
+function renderProgressPanel(activities, allDone) {
+  if (!activities.length) return "";
+  var doneClass = allDone ? " all-done" : "";
+  var MAX_VISIBLE = 4;
+  var hidden = 0;
+  var visible = activities;
+  if (allDone && activities.length > MAX_VISIBLE) {
+    hidden = activities.length - MAX_VISIBLE;
+    visible = activities.slice(-MAX_VISIBLE);
+  } else if (!allDone && activities.length > MAX_VISIBLE + 1) {
+    hidden = activities.length - MAX_VISIBLE - 1;
+    visible = activities.slice(-MAX_VISIBLE - 1);
+  }
+  var lines = [];
+  if (hidden > 0) {
+    lines.push('<div class="ap-step"><span class="ap-mark" style="opacity:.3">⋯</span><span style="opacity:.4">' + hidden + ' ステップ完了</span></div>');
+  }
+  visible.forEach(function(a, i) {
+    var isLast = (i === visible.length - 1);
+    var done = allDone || !isLast;
+    var cls = done ? "ap-step" : "ap-step active";
+    var mark = done ? '<span style="opacity:.4">✓</span>' : '<span class="ap-spin"></span>';
+    var detail = a.detail ? '<span class="ap-detail">' + esc(a.detail) + '</span>' : "";
+    lines.push('<div class="' + cls + '"><span class="ap-mark">' + mark + '</span><span>' + esc(a.label) + '</span>' + detail + '</div>');
+  });
+  return '<div class="agent-progress' + doneClass + '">' + lines.join("") + '</div>';
+}
+function showChatHelp() { document.getElementById("chatHelpPopup").classList.add("show"); document.getElementById("chatHelpOverlay").classList.add("show"); closeSB() }
+function closeChatHelp() { document.getElementById("chatHelpPopup").classList.remove("show"); document.getElementById("chatHelpOverlay").classList.remove("show") }
 document.addEventListener("click", function(e) { var mp = document.getElementById("modelPopup"), mb = document.getElementById("modelBtn"); if (!mp.contains(e.target) && !mb.contains(e.target)) mp.classList.remove("show") });
 
 init();
